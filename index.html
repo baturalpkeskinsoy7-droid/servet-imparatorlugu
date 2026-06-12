@@ -1,560 +1,165 @@
 <!doctype html>
 <html lang="tr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Servet Imparatorlugu v1.0</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { margin: 0; background: #080d16; color: #f8fafc; font-family: Arial, sans-serif; }
-    .app { max-width: 540px; margin: 0 auto; padding: 14px; }
-    .card { background: #121826; border: 1px solid #293449; border-radius: 18px; padding: 14px; margin-bottom: 12px; }
-    h1 { margin: 0 0 6px; font-size: 25px; }
-    h2 { margin: 0 0 10px; font-size: 20px; }
-    h3 { margin: 12px 0 6px; font-size: 17px; }
-    p { margin: 7px 0; }
-    .muted { color: #9ca3af; font-size: 14px; }
-    .status { color: #22c55e; font-weight: bold; }
-    .error { color: #f87171; font-weight: bold; }
-    input, select, textarea, button { width: 100%; padding: 12px; margin-top: 8px; border-radius: 13px; border: 1px solid #334155; font-size: 16px; }
-    input, select, textarea { background: #0b1020; color: #ffffff; }
-    button { background: #2563eb; color: #ffffff; font-weight: bold; cursor: pointer; }
-    button:active { transform: scale(0.99); }
-    .secondary { background: #374151; }
-    .danger { background: #991b1b; }
-    .sell { background: #15803d; }
-    .warn { background: #b45309; }
-    .tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 12px; }
-    .tabbtn { background: #1f2937; padding: 10px 5px; font-size: 14px; }
-    .tabbtn.active { background: #2563eb; }
-    .tab { display: none; }
-    .tab.active { display: block; }
-    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
-    .stat { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 11px; min-height: 72px; }
-    .stat b { font-size: 18px; display: block; margin-top: 4px; }
-    .item { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 11px; margin-top: 9px; }
-    .item-title { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
-    .item-title b { font-size: 16px; }
-    .actions { display: grid; grid-template-columns: repeat(3, 1fr); gap: 7px; margin-top: 8px; }
-    .actions button { padding: 9px 5px; font-size: 13px; margin-top: 0; }
-    .two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    .log { max-height: 260px; overflow: auto; }
-    .log p { border-bottom: 1px solid #26324a; padding-bottom: 6px; font-size: 14px; color: #cbd5e1; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Servet Imparatorlugu v1.0.1</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#07101c;color:#f8fafc;font-family:Arial,sans-serif}.app{max-width:720px;margin:0 auto;padding:18px}.hero,.card{background:#111b2b;border:1px solid #2a3a55;border-radius:22px;padding:18px;margin-bottom:16px}h1{margin:0 0 8px;font-size:34px}h2{margin:0 0 14px;font-size:28px}.muted{color:#a3adbd}.ok{color:#22c55e;font-weight:800}.err{color:#fb7185;font-weight:800}input,select,textarea,button{width:100%;padding:14px;border-radius:14px;border:1px solid #354760;background:#080d1d;color:#fff;font-size:17px;margin-top:10px}button{background:#2563eb;border:0;font-weight:800}button.gray{background:#334155}button.green{background:#15803d}button.red{background:#991b1b}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.tabbtn{background:#1f2937}.tabbtn.active{background:#2563eb}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{background:#080d1d;border:1px solid #2a3a55;border-radius:18px;padding:14px;margin-top:12px}.row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#080d1d;border:1px solid #2a3a55;border-radius:16px;padding:14px}.stat b{font-size:22px}.right{float:right}.small{font-size:14px}.full{grid-column:1/-1}@media(max-width:520px){.tabs{grid-template-columns:repeat(3,1fr)}h1{font-size:30px}.row{grid-template-columns:1fr 1fr}.row .red{grid-column:auto}.grid{grid-template-columns:1fr 1fr}}
+</style>
 </head>
 <body>
 <div class="app">
-  <div class="card">
-    <h1>Servet Imparatorlugu</h1>
-    <p class="muted">v0.9.1 - Sermaye ekle + para ekle duzeltmesi</p>
-    <p id="status" class="status">Motor yukleniyor...</p>
-  </div>
+<div class="hero">
+<h1>Servet Imparatorlugu</h1>
+<div class="muted">v1.0.1 Hotfix</div>
+<div id="status" class="ok">Motor yukleniyor...</div>
+</div>
 
-  <div class="card">
-    <h2>Profil Secimi</h2>
-    <select id="profileSelect"></select>
-    <div class="two">
-      <input id="profileName" type="text" placeholder="Profil adi">
-      <input id="profileAge" type="number" placeholder="Yas">
-    </div>
-    <input id="profileJob" type="text" placeholder="Maasli meslek">
-    <input id="profileSector" type="text" placeholder="Profil sektoru (ornegin Sanayi, Finans, Girisimci)">
-    <div class="two">
-      <input id="profileCash" type="number" placeholder="Baslangic nakit">
-      <input id="profileSalary" type="number" placeholder="Haftalik maas">
-    </div>
-    <input id="profileExpense" type="number" placeholder="Haftalik gider (5000 veya 5000-12000)">
-    <button id="useMinWageBtn" class="secondary" type="button">Asgari Maasi Kullan</button>
-    <button id="useDefaultExpenseBtn" class="secondary" type="button">Varsayilan Gideri Kullan</button>
-    <button id="addProfileBtn" type="button">+ Profil Olustur</button>
-  </div>
+<div class="card">
+<h2>Profil Secimi</h2>
+<select id="profileSelect"></select>
+<input id="pName" placeholder="Profil adi">
+<div class="grid">
+<input id="pAge" type="number" placeholder="Yas">
+<input id="pCash" type="number" placeholder="Nakit">
+<input id="pJob" placeholder="Meslek">
+<input id="pSector" placeholder="Sektor">
+<input id="pSalary" type="number" placeholder="Haftalik maas">
+<input id="pExpense" type="number" placeholder="Haftalik gider">
+</div>
+<div class="row2">
+<button id="useMinWage" class="gray">Asgari Maasi Kullan</button>
+<button id="useDefaultExpense" class="gray">Varsayilan Gideri Kullan</button>
+</div>
+<button id="addProfileBtn">+ Profil Olustur</button>
+</div>
 
-  <div class="tabs">
-    <button class="tabbtn active" type="button" data-tab="panel">Panel</button>
-    <button class="tabbtn" type="button" data-tab="profileTab">Profil</button>
-    <button class="tabbtn" type="button" data-tab="assets">Varlik</button>
-    <button class="tabbtn" type="button" data-tab="companies">Sirket</button>
-    <button class="tabbtn" type="button" data-tab="investments">Yatirim</button>
-    <button class="tabbtn" type="button" data-tab="npcs">NPC</button>
-    <button class="tabbtn" type="button" data-tab="ranking">Siralama</button>
-    <button class="tabbtn" type="button" data-tab="logs">Hareket</button>
-    <button class="tabbtn" type="button" data-tab="settings">Ayarlar</button>
-    <button id="nextWeekBtn" type="button">+ Hafta</button>
-  </div>
+<div class="tabs">
+<button class="tabbtn active" data-tab="panel">Panel</button>
+<button class="tabbtn" data-tab="profile">Profil</button>
+<button class="tabbtn" data-tab="assets">Varlik</button>
+<button class="tabbtn" data-tab="companies">Sirket</button>
+<button class="tabbtn" data-tab="investments">Yatirim</button>
+<button class="tabbtn" data-tab="npcs">NPC</button>
+<button class="tabbtn" data-tab="ranking">Siralama</button>
+<button class="tabbtn" data-tab="log">Hareket</button>
+<button class="tabbtn" data-tab="settings">Ayarlar</button>
+<button id="nextWeekBtn">+ Hafta</button>
+</div>
 
-  <div id="panel" class="tab active card">
-    <h2>Ana Panel</h2>
-    <div class="grid">
-      <div class="stat">Aktif Profil<b id="activeProfile">Yok</b></div>
-      <div class="stat">Toplam Servet<b id="wealthView">0</b></div>
-      <div class="stat">Nakit<b id="cashView">0</b></div>
-      <div class="stat">Hafta<b id="weekView">1</b></div>
-      <div class="stat">Meslek<b id="jobView">Yok</b></div>
-      <div class="stat">Sektor<b id="sectorView">Yok</b></div>
-      <div class="stat">Yas<b id="ageView">0</b></div>
-    </div>
-    <h3>Son Hareketler</h3>
-    <div id="lastLogs" class="log"></div>
-  </div>
+<div id="panel" class="tab active card"><h2>Ana Panel</h2><div class="grid">
+<div class="stat">Servet<br><b id="wealthView">0</b></div><div class="stat">Nakit<br><b id="cashView">0</b></div>
+<div class="stat">Banka<br><b id="bankView">0</b></div><div class="stat">Hafta<br><b id="weekView">1</b></div>
+<div class="stat">Aktif Profil<br><b id="activeView">Yok</b></div><div class="stat">Sektor<br><b id="sectorView">-</b></div>
+</div></div>
 
-  <div id="profileTab" class="tab card">
-    <h2>Profil Duzenle</h2>
-    <input id="editName" type="text" placeholder="Ad">
-    <input id="editAge" type="number" placeholder="Yas">
-    <input id="editJob" type="text" placeholder="Meslek">
-    <input id="editSector" type="text" placeholder="Sektor">
-    <input id="editCash" type="number" placeholder="Nakit">
-    <input id="editSalary" type="number" placeholder="Haftalik maas">
-    <input id="editExpense" type="number" placeholder="Haftalik gider (5000 veya 5000-12000)">
-    <button id="saveProfileBtn" type="button">Profili Kaydet</button>
-    <button id="deleteProfileBtn" type="button" class="danger">Aktif Profili Sil</button>
-  </div>
+<div id="profile" class="tab card"><h2>Profil Duzenle</h2>
+<input id="eName" placeholder="Ad"><div class="grid"><input id="eAge" type="number" placeholder="Yas"><input id="eCash" type="number" placeholder="Nakit"><input id="eJob" placeholder="Meslek"><input id="eSector" placeholder="Sektor"><input id="eSalary" type="number" placeholder="Haftalik maas"><input id="eExpense" type="number" placeholder="Haftalik gider"></div>
+<button id="saveProfileBtn">Profili Kaydet</button><button id="deleteProfileBtn" class="red">Profili Sil</button></div>
 
-  <div id="assets" class="tab card">
-    <h2>Varliklar</h2>
-    <select id="assetType">
-      <option>Araba</option><option>Ev</option><option>Arsa</option><option>Depo</option><option>Fabrika</option><option>Diger</option>
-    </select>
-    <input id="assetName" type="text" placeholder="Varlik adi">
-    <input id="assetValue" type="number" placeholder="Deger / satin alma bedeli">
-    <input id="assetIncome" type="text" placeholder="Haftalik gelir (10000 veya 10000-25000)">
-    <input id="assetExpense" type="text" placeholder="Haftalik gider veya kira (5000 veya 5000-12000)">
-    <button id="addAssetBtn" type="button">Varlik Ekle</button>
-    <div id="assetList"></div>
-  </div>
+<div id="assets" class="tab card"><h2>Varliklar</h2>
+<select id="assetType"><option>Ev</option><option>Araba</option><option>Arsa</option><option>Depo</option><option>Fabrika</option><option>Ofis</option><option>Yat</option><option>Ozel Jet</option><option>Diger</option></select>
+<select id="assetOwnership"><option value="buy">Satin Al</option><option value="rent">Kirala</option></select>
+<input id="assetName" placeholder="Varlik adi"><input id="assetValue" type="number" placeholder="Deger / satin alma fiyati">
+<input id="assetIncome" placeholder="Haftalik gelir (10000 veya 10000-25000)"><input id="assetExpense" placeholder="Haftalik gider/kira (5000 veya 5000-12000)">
+<button id="addAssetBtn">Varlik Ekle</button><div id="assetList"></div></div>
 
-  <div id="companies" class="tab card">
-    <h2>Sirketler</h2>
-    <select id="companySector">
-      <option>Sanayi</option><option>Talasli Uretim / CNC</option><option>Mermer ve Madencilik</option><option>Insaat</option><option>Gayrimenkul</option><option>Turizm</option><option>Otelcilik</option><option>Lojistik</option><option>Kargo</option><option>Denizcilik</option><option>Havayolu</option><option>Otomotiv</option><option>Savunma Sanayii</option><option>Havacilik ve Uzay</option><option>Makine Imalati</option><option>Metal ve Celik</option><option>Elektronik</option><option>Tekstil</option><option>Mobilya</option><option>Gida</option><option>Tarim</option><option>Hayvancilik</option><option>Restoran Zinciri</option><option>Market / Supermarket</option><option>Saglik</option><option>Hastane</option><option>Ilac Sanayii</option><option>Medikal Ekipman</option><option>Yazilim</option><option>Yapay Zeka</option><option>Siber Guvenlik</option><option>Oyun Gelistirme</option><option>Telekomunikasyon</option><option>Enerji</option><option>Yenilenebilir Enerji</option><option>Petrol ve Dogalgaz</option><option>Finans</option><option>Bankacilik</option><option>Sigortacilik</option><option>Yatirim Sirketi</option><option>Holding</option><option>E-Ticaret</option><option>Perakende</option><option>Ithalat / Ihracat</option><option>Medya</option><option>Film / Dizi Yapim</option><option>Egitim</option><option>Guvenlik</option><option>Danismanlik</option><option>Ozel Sektor</option><option>Diger</option>
-    </select>
-    <input id="companyName" type="text" placeholder="Sirket adi">
-    <input id="companyValue" type="number" placeholder="Sirket degeri">
-    <input id="companyShare" type="number" placeholder="Hisse orani %" value="100">
-    <input id="companyIncome" type="text" placeholder="Haftalik gelir (10000 veya 10000-25000)">
-    <input id="companyExpense" type="text" placeholder="Haftalik gider (5000 veya 5000-12000)">
-    <button id="addCompanyBtn" type="button">Sirket Ekle</button>
-    <div id="companyList"></div>
-  </div>
+<div id="companies" class="tab card"><h2>Sirketler</h2>
+<select id="companySector"></select><input id="companyName" placeholder="Sirket adi"><input id="companyValue" type="number" placeholder="Sirket degeri"><input id="companyShare" type="number" placeholder="Hisse orani %" value="100"><input id="companyIncome" placeholder="Haftalik gelir (10000 veya 10000-25000)"><input id="companyExpense" placeholder="Haftalik gider (5000 veya 5000-12000)"><button id="addCompanyBtn">Sirket Ekle</button><div id="companyList"></div></div>
 
-  <div id="investments" class="tab card">
-    <h2>Yatirimlar</h2>
-    <select id="investmentType">
-      <option>Kripto</option><option>Hisse</option><option>Fon</option><option>Altin</option><option>Doviz</option><option>Diger</option>
-    </select>
-    <input id="investmentName" type="text" placeholder="Yatirim adi">
-    <input id="investmentValue" type="number" placeholder="Guncel deger">
-    <button id="addInvestmentBtn" type="button">Yatirim Ekle</button>
-    <div id="investmentList"></div>
-  </div>
+<div id="investments" class="tab card"><h2>Yatirimlar</h2>
+<select id="investmentType"><option>Kripto</option><option>Hisse</option><option>Fon</option><option>Altin</option><option>Doviz</option><option>Diger</option></select><input id="investmentName" placeholder="Yatirim adi"><input id="investmentValue" type="number" placeholder="Guncel deger"><button id="addInvestmentBtn">Yatirim Ekle</button><div id="investmentList"></div></div>
 
-  <div id="npcs" class="tab card">
-    <h2>NPC / Yan Karakterler</h2>
-    <input id="npcName" type="text" placeholder="Karakter adi">
-    <input id="npcWealth" type="number" placeholder="Baslangic serveti">
-    <input id="npcSector" type="text" placeholder="Sektor / not">
-    <div class="two">
-      <input id="npcMinChange" type="number" placeholder="Min haftalik %" value="-3">
-      <input id="npcMaxChange" type="number" placeholder="Max haftalik %" value="5">
-    </div>
-    <button id="addNpcBtn" type="button">NPC Ekle</button>
-    <div class="two">
-      <button id="randomNpcBtn" class="secondary" type="button">Rastgele NPC</button>
-      <button id="random5NpcBtn" class="secondary" type="button">5 Rastgele NPC</button>
-    </div>
-    <button id="random10NpcBtn" class="secondary" type="button">10 Rastgele NPC</button>
-    <p class="muted">NPC serveti hafta ilerledikce belirledigin oran araliginda otomatik degisir. Istersen duzenleyip manuel mudahele edebilirsin.</p>
-    <div id="npcList"></div>
-  </div>
+<div id="npcs" class="tab card"><h2>NPC / Yan Karakter</h2>
+<input id="npcName" placeholder="NPC adi"><input id="npcWealth" type="number" placeholder="Servet"><input id="npcSector" placeholder="Sektor"><div class="grid"><input id="npcMin" type="number" placeholder="Min %"><input id="npcMax" type="number" placeholder="Max %"></div><button id="addNpcBtn">NPC Ekle</button><div class="row"><button id="rnd1" class="gray">1 Rastgele</button><button id="rnd5" class="gray">5 Rastgele</button><button id="rnd10" class="gray">10 Rastgele</button></div><div id="npcList"></div></div>
 
-  <div id="ranking" class="tab card">
-    <h2>Servet Siralamasi</h2>
-    <div id="rankingList"></div>
-  </div>
+<div id="ranking" class="tab card"><h2>Servet Siralamasi</h2><div id="rankingList"></div></div>
+<div id="log" class="tab card"><h2>Hareket Gecmisi</h2><div id="logList"></div></div>
 
-  <div id="logs" class="tab card">
-    <h2>Hareket Gecmisi</h2>
-    <div id="logList" class="log"></div>
-  </div>
-
-  <div id="settings" class="tab card">
-    <h2>Ayarlar</h2>
-    <label class="muted">Para birimi</label>
-    <select id="currencySelect">
-      <option value="EUR">EUR</option><option value="USD">USD</option><option value="TRY">TRY</option>
-    </select>
-
-    <label class="muted">Varsayilan haftalik asgari maas</label>
-    <input id="minWageInput" type="number" placeholder="Orn: 500">
-
-    <label class="muted">Varsayilan haftalik yasam gideri</label>
-    <input id="defaultExpenseInput" type="number" placeholder="Orn: 150">
-
-    <label class="muted">Yeni profiller asgari maasla baslasin</label>
-    <select id="newProfilesMinWageSelect">
-      <option value="no">Hayir, manuel girecegim</option>
-      <option value="yes">Evet, otomatik doldur</option>
-    </select>
-
-    <label class="muted">Nakit yetmezse satin alma</label>
-    <select id="negativeCashSelect">
-      <option value="no">Engelle</option>
-      <option value="yes">Izin ver, nakit eksiye dussun</option>
-    </select>
-
-    <label class="muted">Haftalik deger degisimi</label>
-    <select id="fluctuationSelect">
-      <option value="yes">Acik</option>
-      <option value="no">Kapali</option>
-    </select>
-
-    <label class="muted">Sat / sil onay pencereleri</label>
-    <select id="confirmSelect">
-      <option value="yes">Acik</option>
-      <option value="no">Kapali</option>
-    </select>
-
-    <label class="muted">Varsayilan NPC haftalik min degisim %</label>
-    <input id="npcMinSetting" type="number" placeholder="-3">
-
-    <label class="muted">Varsayilan NPC haftalik max degisim %</label>
-    <input id="npcMaxSetting" type="number" placeholder="5">
-
-    <label class="muted">Hareket gecmisi limiti</label>
-    <input id="logLimitInput" type="number" placeholder="80">
-
-    <p class="muted">Surum: v0.9.1 | Otomatik kayit: Acik | Kayit yeri: Bu tarayici</p>
-    <button id="saveSettingsBtn" type="button">Ayarlari Kaydet</button>
-    <button id="exportBtn" type="button" class="secondary">Veriyi Disa Aktar</button>
-    <textarea id="dataBox" rows="6" placeholder="Veri burada gorunur veya buraya yapistirilir"></textarea>
-    <button id="importBtn" type="button" class="secondary">Veriyi Ice Aktar</button>
-    <button id="clearLogsBtn" type="button" class="warn">Hareketleri Temizle</button>
-    <button id="resetBtn" type="button" class="danger">Tum Verileri Sifirla</button>
-  </div>
+<div id="settings" class="tab card"><h2>Ayarlar</h2>
+<div class="grid"><input id="currencyInput" placeholder="Para birimi" value="TL"><input id="minWageInput" type="number" placeholder="Haftalik asgari maas"><input id="defaultExpenseInput" type="number" placeholder="Varsayilan haftalik gider"><input id="logLimitInput" type="number" placeholder="Hareket limiti"></div>
+<div class="row2"><button id="toggleNegativeBtn" class="gray">Nakit yetmezse engelle</button><button id="toggleMarketBtn" class="gray">Deger dalgalanmasi acik</button></div>
+<button id="saveSettingsBtn">Ayarlari Kaydet</button><button id="exportBtn" class="gray">Veriyi Disa Aktar</button><textarea id="importBox" placeholder="Yedek JSON buraya"></textarea><button id="importBtn" class="gray">Ice Aktar</button><button id="resetBtn" class="red">Tum Verileri Sifirla</button></div>
 </div>
 
 <script>
-window.onerror = function(message, source, line) {
-  var st = document.getElementById("status");
-  if (st) { st.className = "error"; st.textContent = "JS HATASI: " + message + " / line " + line; }
+window.onerror=function(m,s,l,c,e){var st=document.getElementById("status");if(st){st.className="err";st.textContent="JS HATASI: "+m+" / line "+l;}};
+
+var STORAGE_KEY="servet_imparatorlugu_v101";
+var sectors=["Sanayi","Talasli Uretim / CNC","Otomotiv","Savunma Sanayii","Havacilik ve Uzay","Gemi Insa","Makine Imalati","Elektronik","Beyaz Esya","Metal ve Celik","Kimya","Plastik ve Kaucuk","Ambalaj","Tekstil","Mobilya","Mermer ve Madencilik","Enerji Ekipmanlari","Gida","Tarim","Hayvancilik","Sut Urunleri","Icecek","Restoran Zinciri","Fast Food","Kahve Zinciri","Market","Saglik","Hastane","Ozel Klinik","Ilac Sanayii","Medikal Ekipman","Laboratuvar","Veteriner","Insaat","Gayrimenkul","Muteahhitlik","Mimarlik","Altyapi","Lojistik","Kargo","Denizcilik","Havayolu","Karayolu Tasimaciligi","Demiryolu","Liman","Yazilim","Yapay Zeka","Siber Guvenlik","Oyun Gelistirme","Telekom","Veri Merkezi","Finans","Bankacilik","Yatirim Sirketi","Holding","Sigorta","Varlik Yonetimi","Kripto Blockchain","Turizm","Otelcilik","Tatil Koyu","Seyahat Acentesi","Eglence","Spor Kulubu","Medya","Film Dizi","Reklam","E-Ticaret","Perakende","Toptan Ticaret","Ithalat Ihracat","Kuyumculuk","Petrol Dogalgaz","Yenilenebilir Enerji","Elektrik","Egitim","Universite","Danismanlik","Guvenlik","Temizlik","Diger"];
+var firstNames=["Atlas","Nora","Leyla","Efe","Ada","Aras","Mira","Kerem","Sarp","Lara","Alp","Deniz","Selin","Yigit","Mert","Derya","Mina","Kaan"];
+var lastNames=["Demir","Stone","Wolf","Morgan","Sahin","Kaya","Yildiz","Aydin","Black","Arslan","Kaplan","Stein","Kurt","Keskin","Aslan"];
+
+var game={
+ version:"v1.0.1", week:1, activeProfileId:null,
+ settings:{currency:"TL",minWage:5000,defaultExpense:2000,logLimit:80,blockNegative:false,marketChanges:true,npcMin:-3,npcMax:6},
+ profiles:[], npcs:[], logs:[]
 };
 
-var STORE_KEY = "servet_game_v04";
-var game = { version: "1.0", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } };
+function uid(){return String(Date.now())+String(Math.floor(Math.random()*9999));}
+function n(v){var x=Number(v);return isNaN(x)?0:x;}
+function fmt(v){return Math.round(n(v)).toLocaleString("tr-TR")+" "+game.settings.currency;}
+function active(){for(var i=0;i<game.profiles.length;i++){if(game.profiles[i].id===game.activeProfileId)return game.profiles[i];}return null;}
+function log(t){game.logs.unshift("Hafta "+game.week+": "+t);if(game.logs.length>game.settings.logLimit)game.logs.length=game.settings.logLimit;}
+function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify(game));}
+function load(){var d=localStorage.getItem(STORAGE_KEY);if(d){game=JSON.parse(d);fixGame();return;}var keys=["servet_imparatorlugu_v09","servet_imparatorlugu_v08","servet_clean_v01"];for(var i=0;i<keys.length;i++){d=localStorage.getItem(keys[i]);if(d){try{game=JSON.parse(d);fixGame();return;}catch(e){}}}}
+function fixGame(){game.settings=game.settings||{};var def={currency:"TL",minWage:5000,defaultExpense:2000,logLimit:80,blockNegative:false,marketChanges:true,npcMin:-3,npcMax:6};for(var k in def){if(game.settings[k]===undefined)game.settings[k]=def[k];}game.profiles=game.profiles||[];game.npcs=game.npcs||[];game.logs=game.logs||[];for(var i=0;i<game.profiles.length;i++){var p=game.profiles[i];p.assets=p.assets||[];p.companies=p.companies||[];p.investments=p.investments||[];p.bank=n(p.bank);p.sector=p.sector||"";p.job=p.job||"";p.age=n(p.age);p.salary=n(p.salary);p.expense=n(p.expense);}}
+function charge(p,amount,reason){amount=n(amount);if(amount<=0)return true;if(game.settings.blockNegative && n(p.cash)<amount){alert("Nakit yetersiz.");return false;}p.cash=n(p.cash)-amount;log("-"+fmt(amount)+" "+reason);return true;}
+function gain(p,amount,reason){amount=n(amount);if(amount<=0)return;p.cash=n(p.cash)+amount;log("+"+fmt(amount)+" "+reason);}
+function parseRange(v){if(v===undefined||v===null||String(v).trim()==="")return 0;var s=String(v).replace(",",".").replace(/\s/g,"");if(s.indexOf("-")>-1){var a=s.split("-");var min=n(a[0]);var max=n(a[1]);if(max<min){var t=min;min=max;max=t;}return Math.round(min+Math.random()*(max-min));}return n(s);}
+function scaleRange(v,ratio){if(!v)return v;var s=String(v).replace(/\s/g,"");if(s.indexOf("-")>-1){var a=s.split("-");return Math.round(n(a[0])*ratio)+"-"+Math.round(n(a[1])*ratio);}return String(Math.round(n(s)*ratio));}
+function wealth(p){var total=n(p.cash)+n(p.bank);for(var i=0;i<p.assets.length;i++){if(p.assets[i].ownership!=="rent")total+=n(p.assets[i].value);}for(i=0;i<p.companies.length;i++){total+=n(p.companies[i].value)*n(p.companies[i].share)/100;}for(i=0;i<p.investments.length;i++){total+=n(p.investments[i].value);}return total;}
 
-function uid() { return String(Date.now()) + String(Math.floor(Math.random() * 1000)); }
-function sym() { if (game.currency === "USD") return "$"; if (game.currency === "TRY") return "TL"; return "EUR"; }
-function money(n) { return Number(n || 0).toLocaleString("tr-TR") + " " + sym(); }
-function parseRangeValue(value) {
-  if (value === undefined || value === null) return { min: 0, max: 0, raw: "0" };
-  var raw = String(value).trim().replace(/ /g, "").replace(/,/g, ".");
-  if (raw === "") return { min: 0, max: 0, raw: "0" };
-  var parts = raw.split("-");
-  var min = Number(parts[0] || 0);
-  var max = parts.length > 1 ? Number(parts[1] || parts[0] || 0) : min;
-  if (isNaN(min)) min = 0;
-  if (isNaN(max)) max = min;
-  if (min > max) { var t = min; min = max; max = t; }
-  return { min: min, max: max, raw: raw };
-}
-function resolveRangeValue(value) {
-  var r = parseRangeValue(value);
-  if (r.min === r.max) return Math.round(r.min);
-  return Math.round(r.min + Math.random() * (r.max - r.min));
-}
-function rangeText(value) {
-  var r = parseRangeValue(value);
-  if (r.min === r.max) return money(r.min);
-  return money(r.min) + " - " + money(r.max);
-}
-function rangeNetText(income, expense) {
-  var inc = parseRangeValue(income);
-  var exp = parseRangeValue(expense);
-  if (inc.min === inc.max && exp.min === exp.max) return money(inc.min - exp.min);
-  return money(inc.min - exp.max) + " / " + money(inc.max - exp.min);
-}
-function clampShare(n) { n = Number(n || 0); if (n < 0) return 0; if (n > 100) return 100; return n; }
-function addLog(text) { var limit = Number((game.settings && game.settings.logLimit) || 80); game.logs.unshift("Hafta " + game.week + ": " + text); while (game.logs.length > limit) game.logs.pop(); }
-function saveGame() { localStorage.setItem(STORE_KEY, JSON.stringify(game)); }
-function loadGame() { var data = localStorage.getItem(STORE_KEY); if (data) { game = JSON.parse(data); } migrate(); }
-function migrate() {
-  if (!game.logs) game.logs = [];
-  if (!game.currency) game.currency = "EUR";
-  if (!game.npcs) game.npcs = [];
-  if (!game.settings) game.settings = {};
-  if (!game.settings.allowNegativeCash) game.settings.allowNegativeCash = "no";
-  if (!game.settings.valueFluctuation) game.settings.valueFluctuation = "yes";
-  if (!game.settings.confirmActions) game.settings.confirmActions = "yes";
-  if (!game.settings.logLimit) game.settings.logLimit = 80;
-  if (!game.settings.weeklyMinimumWage && game.settings.weeklyMinimumWage !== 0) game.settings.weeklyMinimumWage = 500;
-  if (!game.settings.defaultWeeklyExpense && game.settings.defaultWeeklyExpense !== 0) game.settings.defaultWeeklyExpense = 0;
-  if (!game.settings.newProfilesUseMinimumWage) game.settings.newProfilesUseMinimumWage = "no";
-  if (game.settings.npcMinChange === undefined) game.settings.npcMinChange = -3;
-  if (game.settings.npcMaxChange === undefined) game.settings.npcMaxChange = 5;
-  game.version = "1.0";
-  for (var i = 0; i < game.profiles.length; i++) {
-    var p = game.profiles[i];
-    if (!p.assets) p.assets = [];
-    if (!p.companies) p.companies = [];
-    if (!p.investments) p.investments = [];
-    if (p.age === undefined) p.age = 0;
-    if (p.job === undefined) p.job = "";
-    if (p.sector === undefined) p.sector = "";
-    if (p.weeklySalary === undefined) p.weeklySalary = 0;
-    if (p.weeklyExpense === undefined) p.weeklyExpense = 0;
-    for (var a = 0; a < p.assets.length; a++) { if (!p.assets[a].ownership) p.assets[a].ownership = "owned"; }
-  }
-}
-function getActiveProfile() { for (var i = 0; i < game.profiles.length; i++) { if (game.profiles[i].id === game.activeProfileId) return game.profiles[i]; } return null; }
-function profileWealth(p) {
-  var total = Number(p.cash || 0);
-  var i;
-  for (i = 0; i < p.assets.length; i++) { if (p.assets[i].ownership !== "rented") total += Number(p.assets[i].value || 0); }
-  for (i = 0; i < p.investments.length; i++) total += Number(p.investments[i].value || 0);
-  for (i = 0; i < p.companies.length; i++) total += Number(p.companies[i].value || 0) * clampShare(p.companies[i].share) / 100;
-  return Math.round(total);
-}
-function requireProfile() { var p = getActiveProfile(); if (!p) alert("Once profil olustur."); return p; }
-function ask(text) { if (game.settings && game.settings.confirmActions === "no") return true; return confirm(text); }
-function spendCash(p, amount, label) {
-  amount = Math.round(Number(amount || 0));
-  if (amount <= 0) return true;
-  if (Number(p.cash || 0) < amount && (!game.settings || game.settings.allowNegativeCash !== "yes")) {
-    alert(label + " icin yeterli nakit yok. Gereken: " + money(amount) + " / Nakit: " + money(p.cash));
-    return false;
-  }
-  p.cash = Math.round(Number(p.cash || 0) - amount);
-  return true;
-}
-function canSpend(p, amount, label) { return spendCash(p, amount, label); }
-function applyMinWageToCreateForm() { document.getElementById("profileSalary").value = Number(game.settings.weeklyMinimumWage || 0); }
-function applyDefaultExpenseToCreateForm() { document.getElementById("profileExpense").value = Number(game.settings.defaultWeeklyExpense || 0); }
+function setupSectors(){var c=document.getElementById("companySector");c.innerHTML="";for(var i=0;i<sectors.length;i++){var o=document.createElement("option");o.textContent=sectors[i];c.appendChild(o);}}
+function render(){var p=active();renderSelect();document.getElementById("weekView").textContent=game.week;document.getElementById("activeView").textContent=p?p.name:"Yok";document.getElementById("sectorView").textContent=p?(p.sector||"-"):"-";document.getElementById("cashView").textContent=p?fmt(p.cash):fmt(0);document.getElementById("bankView").textContent=p?fmt(p.bank):fmt(0);document.getElementById("wealthView").textContent=p?fmt(wealth(p)):fmt(0);fillProfileEdit();renderAssets();renderCompanies();renderInvestments();renderNpcs();renderRanking();renderLogs();fillSettings();save();}
+function renderSelect(){var s=document.getElementById("profileSelect");s.innerHTML="";if(game.profiles.length===0){var o=document.createElement("option");o.textContent="Profil yok";s.appendChild(o);return;}for(var i=0;i<game.profiles.length;i++){var p=game.profiles[i];var opt=document.createElement("option");opt.value=p.id;opt.textContent=p.name;if(p.id===game.activeProfileId)opt.selected=true;s.appendChild(opt);}}
+function fillProfileEdit(){var p=active();if(!p)return;document.getElementById("eName").value=p.name||"";document.getElementById("eAge").value=p.age||"";document.getElementById("eCash").value=p.cash||0;document.getElementById("eJob").value=p.job||"";document.getElementById("eSector").value=p.sector||"";document.getElementById("eSalary").value=p.salary||0;document.getElementById("eExpense").value=p.expense||0;}
+function addProfile(){var p={id:uid(),name:document.getElementById("pName").value.trim(),age:n(document.getElementById("pAge").value),cash:n(document.getElementById("pCash").value),bank:0,job:document.getElementById("pJob").value.trim(),sector:document.getElementById("pSector").value.trim(),salary:n(document.getElementById("pSalary").value),expense:n(document.getElementById("pExpense").value),assets:[],companies:[],investments:[]};if(!p.name){alert("Profil adi yaz.");return;}game.profiles.push(p);game.activeProfileId=p.id;log(p.name+" profili olusturuldu.");["pName","pAge","pCash","pJob","pSector","pSalary","pExpense"].forEach(function(id){document.getElementById(id).value="";});render();}
+function saveProfile(){var p=active();if(!p)return;p.name=document.getElementById("eName").value.trim()||p.name;p.age=n(document.getElementById("eAge").value);p.cash=n(document.getElementById("eCash").value);p.job=document.getElementById("eJob").value.trim();p.sector=document.getElementById("eSector").value.trim();p.salary=n(document.getElementById("eSalary").value);p.expense=n(document.getElementById("eExpense").value);log(p.name+" profili guncellendi.");render();}
+function deleteProfile(){var p=active();if(!p)return;if(!confirm("Profil silinsin mi?"))return;game.profiles=game.profiles.filter(function(x){return x.id!==p.id;});game.activeProfileId=game.profiles[0]?game.profiles[0].id:null;log(p.name+" profili silindi.");render();}
 
-function addProfile() {
-  var name = document.getElementById("profileName").value.trim();
-  if (!name) { alert("Profil adi yaz."); return; }
-  var salaryValue = Number(document.getElementById("profileSalary").value || 0);
-  if (game.settings.newProfilesUseMinimumWage === "yes" && salaryValue === 0) salaryValue = Number(game.settings.weeklyMinimumWage || 0);
-  var expenseValue = Number(document.getElementById("profileExpense").value || 0);
-  if (expenseValue === 0) expenseValue = Number(game.settings.defaultWeeklyExpense || 0);
-  var p = { id: uid(), name: name, age: Number(document.getElementById("profileAge").value || 0), job: document.getElementById("profileJob").value.trim(), sector: document.getElementById("profileSector").value.trim(), cash: Number(document.getElementById("profileCash").value || 0), weeklySalary: salaryValue, weeklyExpense: expenseValue, assets: [], companies: [], investments: [] };
-  game.profiles.push(p); game.activeProfileId = p.id; addLog("Profil olusturuldu: " + p.name);
-  document.getElementById("profileName").value = ""; document.getElementById("profileAge").value = ""; document.getElementById("profileJob").value = ""; document.getElementById("profileSector").value = ""; document.getElementById("profileCash").value = ""; document.getElementById("profileSalary").value = ""; document.getElementById("profileExpense").value = "";
-  saveGame(); render(); alert("Profil olusturuldu.");
-}
-function selectProfile() { game.activeProfileId = document.getElementById("profileSelect").value; saveGame(); render(); }
-function saveProfileEdit() {
-  var p = requireProfile(); if (!p) return;
-  p.name = document.getElementById("editName").value.trim() || p.name;
-  p.age = Number(document.getElementById("editAge").value || 0);
-  p.job = document.getElementById("editJob").value.trim();
-  p.sector = document.getElementById("editSector").value.trim();
-  p.cash = Number(document.getElementById("editCash").value || 0);
-  p.weeklySalary = Number(document.getElementById("editSalary").value || 0);
-  p.weeklyExpense = Number(document.getElementById("editExpense").value || 0);
-  addLog("Profil duzenlendi: " + p.name); saveGame(); render(); alert("Profil kaydedildi.");
-}
-function deleteActiveProfile() {
-  var p = requireProfile(); if (!p) return;
-  if (!ask(p.name + " profili silinsin mi?")) return;
-  game.profiles = game.profiles.filter(function(x) { return x.id !== p.id; });
-  game.activeProfileId = game.profiles.length ? game.profiles[0].id : null;
-  addLog("Profil silindi: " + p.name); saveGame(); render();
-}
+function addAsset(){var p=active();if(!p){alert("Once profil olustur.");return;}var own=document.getElementById("assetOwnership").value;var val=n(document.getElementById("assetValue").value);var a={id:uid(),type:document.getElementById("assetType").value,ownership:own,name:document.getElementById("assetName").value.trim(),value:val,income:document.getElementById("assetIncome").value.trim(),expense:document.getElementById("assetExpense").value.trim()};if(!a.name){alert("Varlik adi yaz.");return;}if(own==="buy"){if(!charge(p,val,a.name+" satin alindi."))return;}else{log(a.name+" kiralandi.");}p.assets.push(a);["assetName","assetValue","assetIncome","assetExpense"].forEach(function(id){document.getElementById(id).value="";});render();}
+function renderAssets(){var p=active(),box=document.getElementById("assetList");box.innerHTML="";if(!p||p.assets.length===0){box.innerHTML="<p class='muted'>Varlik yok.</p>";return;}p.assets.forEach(function(a){var rented=a.ownership==="rent";box.innerHTML+="<div class='item'><b>"+a.name+"</b><span class='right'>"+(rented?"Kiralik":fmt(a.value))+"</span><br><span class='muted'>"+a.type+" | "+(rented?"Kira/gider: "+a.expense:"Gelir: "+(a.income||0)+" | Gider: "+(a.expense||0))+"</span><div class='row'><button class='gray' onclick='editAsset(\""+a.id+"\")'>Duzenle</button><button class='green' onclick='addAssetValue(\""+a.id+"\")'>Deger Ekle</button><button class='green' onclick='sellAsset(\""+a.id+"\")'>"+(rented?"Kirayi Bitir":"Sat")+"</button><button class='red' onclick='delAsset(\""+a.id+"\")'>Sil</button></div></div>";});}
+function findAsset(id){var p=active();return p.assets.find(function(x){return x.id===id;});}
+function editAsset(id){var p=active(),a=findAsset(id);if(!a)return;var old=n(a.value);var nv=prompt("Yeni deger",a.value);if(nv===null)return;var diff=n(nv)-old;if(diff>0 && a.ownership!=="rent"){if(!charge(p,diff,a.name+" deger artisi."))return;}a.value=n(nv);a.income=prompt("Haftalik gelir",a.income||"")||"";a.expense=prompt("Haftalik gider/kira",a.expense||"")||"";log(a.name+" guncellendi.");render();}
+function addAssetValue(id){var p=active(),a=findAsset(id);if(!a||a.ownership==="rent"){alert("Kiralik varliga deger eklenmez.");return;}var amt=n(prompt("Eklenecek deger",0));if(amt<=0)return;if(!charge(p,amt,a.name+" icin deger eklendi."))return;a.value+=amt;render();}
+function sellAsset(id){var p=active(),a=findAsset(id);if(!a)return;if(a.ownership==="rent"){p.assets=p.assets.filter(function(x){return x.id!==id;});log(a.name+" kirasi bitirildi.");}else{gain(p,a.value,a.name+" satildi.");p.assets=p.assets.filter(function(x){return x.id!==id;});}render();}
+function delAsset(id){var p=active(),a=findAsset(id);if(!a)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.assets=p.assets.filter(function(x){return x.id!==id;});log(a.name+" silindi.");render();}
 
-function addAsset() {
-  var p = requireProfile(); if (!p) return;
-  var name = document.getElementById("assetName").value.trim();
-  if (!name) { alert("Varlik adi yaz."); return; }
-  var value = Number(document.getElementById("assetValue").value || 0);
-  var ownership = document.getElementById("assetOwnership").value || "owned";
-  var income = document.getElementById("assetIncome").value.trim();
-  var expense = document.getElementById("assetExpense").value.trim();
-  if (ownership === "owned") {
-    if (!spendCash(p, value, "Varlik satin alma")) return;
-  }
-  var a = { id: uid(), type: document.getElementById("assetType").value, ownership: ownership, name: name, value: value, income: income, expense: expense };
-  p.assets.push(a);
-  if (ownership === "rented") addLog("Varlik kiralandi: " + a.name + " / haftalik gider: " + rangeText(expense));
-  else addLog("Varlik satin alindi: " + a.name + " -" + money(value));
-  clearAssetForm(); saveGame(); render();
-}
-function clearAssetForm() { document.getElementById("assetName").value = ""; document.getElementById("assetValue").value = ""; document.getElementById("assetIncome").value = ""; document.getElementById("assetExpense").value = ""; document.getElementById("assetOwnership").value = "owned"; }
-function addAssetCapital(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (a.ownership === "rented") { alert("Kiralik varliga deger eklenmez. Kirayi duzenle."); return; } var amount = Number(prompt("Varliga eklenecek tutar", 0) || 0); amount = Math.round(amount); if (amount <= 0) return; if (!spendCash(p, amount, "Varliga deger ekleme")) return; a.value = Math.round(Number(a.value || 0) + amount); addLog("Varliga deger eklendi: " + a.name + " -" + money(amount)); saveGame(); render(); }
-function endAssetRent(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (!ask(a.name + " kirasi sonlandirilsin mi?")) return; p.assets = p.assets.filter(function(x){ return x.id !== id; }); addLog("Kiralik varlik sonlandirildi: " + a.name); saveGame(); render(); }
-function sellAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (a.ownership === "rented") { endAssetRent(id); return; } if (!ask(a.name + " satilsin mi?")) return; p.cash += Number(a.value || 0); p.assets = p.assets.filter(function(x){ return x.id !== id; }); addLog("Varlik satildi: " + a.name + " +" + money(a.value)); saveGame(); render(); }
-function deleteAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (!ask(a.name + " silinsin mi? Para eklenmez.")) return; p.assets = p.assets.filter(function(x){ return x.id !== id; }); addLog("Varlik silindi: " + a.name); saveGame(); render(); }
-function editAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; var oldValue = Number(a.value || 0); var name = prompt("Yeni ad", a.name); if (name === null) return; var value = prompt("Yeni deger", a.value); if (value === null) return; var newValue = Number(value || 0); var delta = Math.round(newValue - oldValue); if (delta > 0 && a.ownership !== "rented") { if (!spendCash(p, delta, "Varlik deger artisi / ek alim")) return; addLog("Varliga ek alim yapildi: " + a.name + " -" + money(delta)); } var income = prompt("Haftalik gelir veya aralik", a.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", a.expense || 0); if (expense === null) return; a.name = name.trim() || a.name; a.value = newValue; a.income = String(income || 0).trim(); a.expense = String(expense || 0).trim(); addLog("Varlik duzenlendi: " + a.name); saveGame(); render(); }
+function addCompany(){var p=active();if(!p){alert("Once profil olustur.");return;}var val=n(document.getElementById("companyValue").value),share=n(document.getElementById("companyShare").value||100),cost=val*share/100;var c={id:uid(),sector:document.getElementById("companySector").value,name:document.getElementById("companyName").value.trim(),value:val,share:share,income:document.getElementById("companyIncome").value.trim(),expense:document.getElementById("companyExpense").value.trim()};if(!c.name){alert("Sirket adi yaz.");return;}if(!charge(p,cost,c.name+" sirket payi alindi."))return;p.companies.push(c);["companyName","companyValue","companyIncome","companyExpense"].forEach(function(id){document.getElementById(id).value="";});document.getElementById("companyShare").value="100";render();}
+function renderCompanies(){var p=active(),box=document.getElementById("companyList");box.innerHTML="";if(!p||p.companies.length===0){box.innerHTML="<p class='muted'>Sirket yok.</p>";return;}p.companies.forEach(function(c){box.innerHTML+="<div class='item'><b>"+c.name+"</b><span class='right'>"+fmt(c.value*c.share/100)+"</span><br><span class='muted'>"+c.sector+" | Hisse %"+c.share+" | Sirket degeri: "+fmt(c.value)+" | Haftalik kar: "+fmt(parseRange(c.income)-parseRange(c.expense))+"</span><div class='row'><button class='gray' onclick='editCompany(\""+c.id+"\")'>Duzenle</button><button class='green' onclick='addCompanyCapital(\""+c.id+"\")'>Sermaye</button><button class='green' onclick='sellCompany(\""+c.id+"\")'>Sat</button><button class='red' onclick='delCompany(\""+c.id+"\")'>Sil</button></div></div>";});}
+function findCompany(id){return active().companies.find(function(x){return x.id===id;});}
+function editCompany(id){var p=active(),c=findCompany(id);if(!c)return;var oldOwned=c.value*c.share/100;var oldValue=c.value;var nv=prompt("Yeni sirket degeri",c.value);if(nv===null)return;var ns=prompt("Yeni hisse %",c.share);if(ns===null)return;c.value=n(nv);c.share=n(ns);var newOwned=c.value*c.share/100;var diff=newOwned-oldOwned;if(diff>0){if(!charge(p,diff,c.name+" pay/deger artisi.")){c.value=oldValue;return;}}var ratio=oldValue>0?c.value/oldValue:1;if(ratio>0&&ratio!==1){c.income=scaleRange(c.income,ratio);c.expense=scaleRange(c.expense,ratio);}c.income=prompt("Haftalik gelir",c.income||"")||"";c.expense=prompt("Haftalik gider",c.expense||"")||"";log(c.name+" guncellendi.");render();}
+function addCompanyCapital(id){var p=active(),c=findCompany(id);if(!c)return;var amt=n(prompt("Eklenecek sermaye",0));if(amt<=0)return;if(!charge(p,amt,c.name+" sermaye artirimi."))return;var old=c.value;c.value+=amt;var ratio=old>0?c.value/old:1;c.income=scaleRange(c.income,ratio);c.expense=scaleRange(c.expense,ratio);render();}
+function sellCompany(id){var p=active(),c=findCompany(id);if(!c)return;gain(p,c.value*c.share/100,c.name+" satildi.");p.companies=p.companies.filter(function(x){return x.id!==id;});render();}
+function delCompany(id){var p=active(),c=findCompany(id);if(!c)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.companies=p.companies.filter(function(x){return x.id!==id;});log(c.name+" silindi.");render();}
 
-function addCompany() { var p = requireProfile(); if (!p) return; var name = document.getElementById("companyName").value.trim(); if (!name) { alert("Sirket adi yaz."); return; } var value = Number(document.getElementById("companyValue").value || 0); var share = clampShare(document.getElementById("companyShare").value || 100); var cost = Math.round(value * share / 100); if (!spendCash(p, cost, "Sirket / hisse satin alma")) return; var c = { id: uid(), sector: document.getElementById("companySector").value, name: name, value: value, share: share, income: document.getElementById("companyIncome").value.trim(), expense: document.getElementById("companyExpense").value.trim() }; p.companies.push(c); addLog("Sirket / hisse alindi: " + c.name + " -" + money(cost)); clearCompanyForm(); saveGame(); render(); }
-function clearCompanyForm() { document.getElementById("companyName").value = ""; document.getElementById("companyValue").value = ""; document.getElementById("companyShare").value = "100"; document.getElementById("companyIncome").value = ""; document.getElementById("companyExpense").value = ""; }
+function addInvestment(){var p=active();if(!p){alert("Once profil olustur.");return;}var v=n(document.getElementById("investmentValue").value);var inv={id:uid(),type:document.getElementById("investmentType").value,name:document.getElementById("investmentName").value.trim(),value:v};if(!inv.name){alert("Yatirim adi yaz.");return;}if(!charge(p,v,inv.name+" yatirimi yapildi."))return;p.investments.push(inv);document.getElementById("investmentName").value="";document.getElementById("investmentValue").value="";render();}
+function renderInvestments(){var p=active(),box=document.getElementById("investmentList");box.innerHTML="";if(!p||p.investments.length===0){box.innerHTML="<p class='muted'>Yatirim yok.</p>";return;}p.investments.forEach(function(x){box.innerHTML+="<div class='item'><b>"+x.name+"</b><span class='right'>"+fmt(x.value)+"</span><br><span class='muted'>"+x.type+"</span><div class='row'><button class='gray' onclick='editInvestment(\""+x.id+"\")'>Duzenle</button><button class='green' onclick='addInvestmentMoney(\""+x.id+"\")'>Para Ekle</button><button class='green' onclick='sellInvestment(\""+x.id+"\")'>Sat</button><button class='red' onclick='delInvestment(\""+x.id+"\")'>Sil</button></div></div>";});}
+function findInvestment(id){return active().investments.find(function(x){return x.id===id;});}
+function editInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;var old=n(x.value);var nv=prompt("Yeni deger",x.value);if(nv===null)return;var diff=n(nv)-old;if(diff>0){if(!charge(p,diff,x.name+" yatirim artisi."))return;}x.value=n(nv);log(x.name+" guncellendi.");render();}
+function addInvestmentMoney(id){var p=active(),x=findInvestment(id);if(!x)return;var amt=n(prompt("Eklenecek para",0));if(amt<=0)return;if(!charge(p,amt,x.name+" yatirimina para eklendi."))return;x.value+=amt;render();}
+function sellInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;gain(p,x.value,x.name+" satildi.");p.investments=p.investments.filter(function(a){return a.id!==id;});render();}
+function delInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.investments=p.investments.filter(function(a){return a.id!==id;});log(x.name+" silindi.");render();}
 
-function addCompanyCapital(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var amountText = prompt("Eklenecek sermaye", "0"); if (amountText === null) return; var amount = Math.round(Number(amountText || 0)); if (amount <= 0) { alert("Gecerli bir tutar yaz."); return; } if (!spendCash(p, amount, "Sermaye ekleme")) return; c.value = Math.round(Number(c.value || 0) + amount); addLog("Sirket sermayesi eklendi: " + c.name + " -" + money(amount)); saveGame(); render(); }
+function addNpc(){var npc={id:uid(),name:document.getElementById("npcName").value.trim(),wealth:n(document.getElementById("npcWealth").value),sector:document.getElementById("npcSector").value.trim(),min:n(document.getElementById("npcMin").value||game.settings.npcMin),max:n(document.getElementById("npcMax").value||game.settings.npcMax)};if(!npc.name){alert("NPC adi yaz.");return;}game.npcs.push(npc);log(npc.name+" NPC eklendi.");["npcName","npcWealth","npcSector","npcMin","npcMax"].forEach(function(id){document.getElementById(id).value="";});render();}
+function randomNpc(){var name=firstNames[Math.floor(Math.random()*firstNames.length)]+" "+lastNames[Math.floor(Math.random()*lastNames.length)];var sec=sectors[Math.floor(Math.random()*sectors.length)];var w=Math.round(50000+Math.random()*5000000);game.npcs.push({id:uid(),name:name,wealth:w,sector:sec,min:game.settings.npcMin,max:game.settings.npcMax});}
+function renderNpcs(){var box=document.getElementById("npcList");box.innerHTML="";if(game.npcs.length===0){box.innerHTML="<p class='muted'>NPC yok.</p>";return;}game.npcs.forEach(function(x){box.innerHTML+="<div class='item'><b>"+x.name+"</b><span class='right'>"+fmt(x.wealth)+"</span><br><span class='muted'>"+(x.sector||"-")+" | %"+x.min+" / %"+x.max+"</span><div class='row2'><button class='gray' onclick='editNpc(\""+x.id+"\")'>Duzenle</button><button class='red' onclick='delNpc(\""+x.id+"\")'>Sil</button></div></div>";});}
+function editNpc(id){var x=game.npcs.find(function(a){return a.id===id;});if(!x)return;x.wealth=n(prompt("Servet",x.wealth));x.sector=prompt("Sektor",x.sector||"")||"";x.min=n(prompt("Min %",x.min));x.max=n(prompt("Max %",x.max));render();}
+function delNpc(id){game.npcs=game.npcs.filter(function(x){return x.id!==id;});render();}
 
-function addInvestmentCapital(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var amountText = prompt("Yatirima eklenecek para", "0"); if (amountText === null) return; var amount = Math.round(Number(amountText || 0)); if (amount <= 0) { alert("Gecerli bir tutar yaz."); return; } if (!spendCash(p, amount, "Yatirima para ekleme")) return; inv.value = Math.round(Number(inv.value || 0) + amount); addLog("Yatirima para eklendi: " + inv.name + " -" + money(amount)); saveGame(); render(); }
+function renderRanking(){var list=[];for(var i=0;i<game.profiles.length;i++){list.push({name:game.profiles[i].name,wealth:wealth(game.profiles[i]),sector:game.profiles[i].sector||""});}for(i=0;i<game.npcs.length;i++){list.push({name:game.npcs[i].name,wealth:game.npcs[i].wealth,sector:game.npcs[i].sector||""});}list.sort(function(a,b){return b.wealth-a.wealth;});var box=document.getElementById("rankingList");box.innerHTML="";if(list.length===0){box.innerHTML="<p class='muted'>Siralama bos.</p>";return;}for(i=0;i<list.length;i++){box.innerHTML+="<div class='item'><b>"+(i+1)+". "+list[i].name+"</b><br>"+fmt(list[i].wealth)+"<br><span class='muted'>"+(list[i].sector||"")+"</span></div>";}}
+function renderLogs(){var box=document.getElementById("logList");box.innerHTML=game.logs.length?game.logs.map(function(x){return "<div class='item'>"+x+"</div>";}).join(""):"<p class='muted'>Hareket yok.</p>";}
+function fillSettings(){document.getElementById("currencyInput").value=game.settings.currency;document.getElementById("minWageInput").value=game.settings.minWage;document.getElementById("defaultExpenseInput").value=game.settings.defaultExpense;document.getElementById("logLimitInput").value=game.settings.logLimit;document.getElementById("toggleNegativeBtn").textContent=game.settings.blockNegative?"Nakit yetmezse engelle: Acik":"Nakit eksiye dussun: Acik";document.getElementById("toggleMarketBtn").textContent=game.settings.marketChanges?"Deger dalgalanmasi: Acik":"Deger dalgalanmasi: Kapali";}
+function saveSettings(){game.settings.currency=document.getElementById("currencyInput").value||"TL";game.settings.minWage=n(document.getElementById("minWageInput").value);game.settings.defaultExpense=n(document.getElementById("defaultExpenseInput").value);game.settings.logLimit=n(document.getElementById("logLimitInput").value)||80;log("Ayarlar kaydedildi.");render();}
 
-function sellCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " satilsin mi?")) return; var sale = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); p.cash += sale; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket satildi: " + c.name + " +" + money(sale)); saveGame(); render(); }
-function deleteCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " silinsin mi? Para eklenmez.")) return; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket silindi: " + c.name); saveGame(); render(); }
-function editCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var oldOwnedValue = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); var name = prompt("Yeni ad", c.name); if (name === null) return; var value = prompt("Yeni deger", c.value); if (value === null) return; var share = prompt("Hisse orani %", c.share); if (share === null) return; var newValue = Number(value || 0); var newShare = clampShare(share); var newOwnedValue = Math.round(newValue * newShare / 100); var delta = newOwnedValue - oldOwnedValue; if (delta > 0) { if (!spendCash(p, delta, "Sirket degeri / hisse artisi")) return; addLog("Sirket hissesine ekleme yapildi: " + c.name + " -" + money(delta)); } var income = prompt("Haftalik gelir veya aralik", c.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", c.expense || 0); if (expense === null) return; c.name = name.trim() || c.name; c.value = newValue; c.share = newShare; c.income = String(income || 0).trim(); c.expense = String(expense || 0).trim(); addLog("Sirket duzenlendi: " + c.name); saveGame(); render(); }
-function addCapitalToCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var amount = Number(prompt("Sirket hissesine eklenecek nakit", 0) || 0); amount = Math.round(amount); if (amount <= 0) return; if (!spendCash(p, amount, "Sirkete sermaye ekleme")) return; var share = clampShare(c.share); if (share <= 0) share = 100; c.value = Math.round(Number(c.value || 0) + (amount * 100 / share)); addLog("Sirkete sermaye eklendi: " + c.name + " -" + money(amount)); saveGame(); render(); }
+function nextWeek(){game.week++;for(var i=0;i<game.profiles.length;i++){var p=game.profiles[i];gain(p,p.salary,"haftalik maas.");charge(p,p.expense,"haftalik gider.");for(var a=0;a<p.assets.length;a++){var as=p.assets[a];var inc=parseRange(as.income), exp=parseRange(as.expense);if(inc)gain(p,inc,as.name+" haftalik geliri.");if(exp)charge(p,exp,as.name+" haftalik gideri.");if(game.settings.marketChanges && as.ownership!=="rent"){as.value=Math.max(0,Math.round(as.value*(1+(-1+Math.random()*3)/100)));}}for(var c=0;c<p.companies.length;c++){var co=p.companies[c];var inc2=parseRange(co.income), exp2=parseRange(co.expense);if(inc2)gain(p,inc2*co.share/100,co.name+" haftalik geliri.");if(exp2)charge(p,exp2*co.share/100,co.name+" haftalik gideri.");if(game.settings.marketChanges){var old=co.value;var ratio=1+(-2+Math.random()*6)/100;co.value=Math.max(0,Math.round(co.value*ratio));co.income=scaleRange(co.income,co.value/(old||co.value||1));co.expense=scaleRange(co.expense,co.value/(old||co.value||1));}}for(var inv=0;inv<p.investments.length;inv++){if(game.settings.marketChanges){p.investments[inv].value=Math.max(0,Math.round(p.investments[inv].value*(1+(-5+Math.random()*12)/100)));}}}for(i=0;i<game.npcs.length;i++){var x=game.npcs[i];var r=1+(x.min+Math.random()*(x.max-x.min))/100;x.wealth=Math.max(0,Math.round(x.wealth*r));}log("Hafta ilerledi.");render();}
 
-function addInvestment() { var p = requireProfile(); if (!p) return; var name = document.getElementById("investmentName").value.trim(); if (!name) { alert("Yatirim adi yaz."); return; } var value = Number(document.getElementById("investmentValue").value || 0); if (!spendCash(p, value, "Yatirim satin alma")) return; var inv = { id: uid(), type: document.getElementById("investmentType").value, name: name, value: value }; p.investments.push(inv); addLog("Yatirim alindi: " + inv.name + " -" + money(value)); document.getElementById("investmentName").value = ""; document.getElementById("investmentValue").value = ""; saveGame(); render(); }
-function sellInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; if (!ask(inv.name + " satilsin mi?")) return; p.cash += Number(inv.value || 0); p.investments = p.investments.filter(function(x){ return x.id !== id; }); addLog("Yatirim satildi: " + inv.name + " +" + money(inv.value)); saveGame(); render(); }
-function deleteInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; if (!ask(inv.name + " silinsin mi? Para eklenmez.")) return; p.investments = p.investments.filter(function(x){ return x.id !== id; }); addLog("Yatirim silindi: " + inv.name); saveGame(); render(); }
-function editInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var oldValue = Number(inv.value || 0); var name = prompt("Yeni ad", inv.name); if (name === null) return; var value = prompt("Yeni deger", inv.value); if (value === null) return; var newValue = Number(value || 0); var delta = Math.round(newValue - oldValue); if (delta > 0) { if (!spendCash(p, delta, "Yatirim ekleme")) return; addLog("Yatirima ekleme yapildi: " + inv.name + " -" + money(delta)); } inv.name = name.trim() || inv.name; inv.value = newValue; addLog("Yatirim duzenlendi: " + inv.name); saveGame(); render(); }
-function addToInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var amount = Number(prompt("Yatirima eklenecek tutar", 0) || 0); amount = Math.round(amount); if (amount <= 0) return; if (!spendCash(p, amount, "Yatirima ekleme")) return; inv.value = Math.round(Number(inv.value || 0) + amount); addLog("Yatirima ekleme yapildi: " + inv.name + " -" + money(amount)); saveGame(); render(); }
-
-
-var randomFirstNames = ["Alexander", "Marcus", "Victor", "Leon", "Arif", "Batur", "Murat", "Emir", "Selim", "Deniz", "Selin", "Elena", "Leyla", "Derya", "Ada", "Nora", "Kerem", "Atlas", "Yigit", "Alp"];
-var randomLastNames = ["Stone", "Demir", "Kaya", "Keskin", "Yildiz", "Wolf", "Black", "Arslan", "Stein", "Rossi", "Aydin", "Kaplan", "Sahin", "Hunter", "King", "Morgan", "Vega", "Yaman", "Aksoy", "Kurt"];
-var randomSectors = ["Sanayi", "Gida", "Saglik", "Teknoloji", "Insaat", "Turizm", "Lojistik", "Finans", "Enerji", "Otomotiv", "E-Ticaret", "Medya", "Savunma Sanayii", "Gayrimenkul", "Madencilik", "Yazilim"];
-function pickRandom(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
-function randomWealthValue() {
-  var tiers = [
-    { min: 50000, max: 500000 },
-    { min: 500000, max: 5000000 },
-    { min: 5000000, max: 50000000 },
-    { min: 50000000, max: 500000000 },
-    { min: 500000000, max: 5000000000 }
-  ];
-  var tier = tiers[Math.floor(Math.random() * tiers.length)];
-  return Math.round(tier.min + Math.random() * (tier.max - tier.min));
-}
-function createRandomNpc() {
-  var minChange = Number(game.settings.npcMinChange || -3);
-  var maxChange = Number(game.settings.npcMaxChange || 5);
-  var npc = { id: uid(), name: pickRandom(randomFirstNames) + " " + pickRandom(randomLastNames), wealth: randomWealthValue(), sector: pickRandom(randomSectors), minChange: minChange, maxChange: maxChange, lastChange: 0 };
-  game.npcs.push(npc);
-  return npc;
-}
-function addRandomNpcs(count) {
-  for (var i = 0; i < count; i++) createRandomNpc();
-  addLog(String(count) + " rastgele NPC eklendi.");
-  saveGame(); render();
-}
-function addNpc() {
-  var name = document.getElementById("npcName").value.trim();
-  if (!name) { alert("NPC adi yaz."); return; }
-  var wealth = Number(document.getElementById("npcWealth").value || 0);
-  var sector = document.getElementById("npcSector").value.trim();
-  var minChange = Number(document.getElementById("npcMinChange").value || game.settings.npcMinChange || -3);
-  var maxChange = Number(document.getElementById("npcMaxChange").value || game.settings.npcMaxChange || 5);
-  if (minChange > maxChange) { var tmp = minChange; minChange = maxChange; maxChange = tmp; }
-  var npc = { id: uid(), name: name, wealth: wealth, sector: sector, minChange: minChange, maxChange: maxChange, lastChange: 0 };
-  game.npcs.push(npc);
-  addLog("NPC eklendi: " + npc.name + " (" + money(npc.wealth) + ")");
-  document.getElementById("npcName").value = "";
-  document.getElementById("npcWealth").value = "";
-  document.getElementById("npcSector").value = "";
-  document.getElementById("npcMinChange").value = String(game.settings.npcMinChange || -3);
-  document.getElementById("npcMaxChange").value = String(game.settings.npcMaxChange || 5);
-  saveGame(); render();
-}
-function editNpc(id) {
-  var npc = null;
-  for (var i = 0; i < game.npcs.length; i++) if (game.npcs[i].id === id) npc = game.npcs[i];
-  if (!npc) return;
-  var name = prompt("Yeni ad", npc.name); if (name === null) return;
-  var wealth = prompt("Yeni servet", npc.wealth); if (wealth === null) return;
-  var sector = prompt("Sektor / not", npc.sector || ""); if (sector === null) return;
-  var minChange = prompt("Min haftalik degisim %", npc.minChange); if (minChange === null) return;
-  var maxChange = prompt("Max haftalik degisim %", npc.maxChange); if (maxChange === null) return;
-  npc.name = name.trim() || npc.name;
-  npc.wealth = Number(wealth || 0);
-  npc.sector = sector.trim();
-  npc.minChange = Number(minChange || 0);
-  npc.maxChange = Number(maxChange || 0);
-  if (npc.minChange > npc.maxChange) { var tmp = npc.minChange; npc.minChange = npc.maxChange; npc.maxChange = tmp; }
-  addLog("NPC duzenlendi: " + npc.name);
-  saveGame(); render();
-}
-function deleteNpc(id) {
-  var npc = null;
-  for (var i = 0; i < game.npcs.length; i++) if (game.npcs[i].id === id) npc = game.npcs[i];
-  if (!npc) return;
-  if (!ask(npc.name + " silinsin mi?")) return;
-  game.npcs = game.npcs.filter(function(x){ return x.id !== id; });
-  addLog("NPC silindi: " + npc.name);
-  saveGame(); render();
-}
-function randomBetween(min, max) {
-  min = Number(min || 0); max = Number(max || 0);
-  if (min > max) { var tmp = min; min = max; max = tmp; }
-  return min + Math.random() * (max - min);
-}
-
-function nextWeek() {
-  game.week += 1;
-  for (var i = 0; i < game.profiles.length; i++) {
-    var p = game.profiles[i];
-    var net = Number(p.weeklySalary || 0) - Number(p.weeklyExpense || 0);
-    p.cash += net;
-    for (var a = 0; a < p.assets.length; a++) {
-      var assetIncome = resolveRangeValue(p.assets[a].income); var assetExpense = resolveRangeValue(p.assets[a].expense); p.cash += assetIncome - assetExpense;
-      if (p.assets[a].ownership !== "rented" && (!game.settings || game.settings.valueFluctuation === "yes")) p.assets[a].value = Math.max(0, Math.round(Number(p.assets[a].value || 0) * (1 + ((Math.random() * 2 - 0.5) / 100))));
-    }
-    for (var c = 0; c < p.companies.length; c++) {
-      var profit = resolveRangeValue(p.companies[c].income) - resolveRangeValue(p.companies[c].expense);
-      p.cash += Math.round(profit * clampShare(p.companies[c].share) / 100);
-      if (!game.settings || game.settings.valueFluctuation === "yes") p.companies[c].value = Math.max(0, Math.round(Number(p.companies[c].value || 0) * (1 + ((Math.random() * 6 - 2) / 100))));
-    }
-    for (var n = 0; n < p.investments.length; n++) {
-      if (!game.settings || game.settings.valueFluctuation === "yes") p.investments[n].value = Math.max(0, Math.round(Number(p.investments[n].value || 0) * (1 + ((Math.random() * 10 - 4) / 100))));
-    }
-  }
-  for (var np = 0; np < game.npcs.length; np++) {
-    var npc = game.npcs[np];
-    var rate = randomBetween(npc.minChange, npc.maxChange);
-    npc.lastChange = Math.round(rate * 100) / 100;
-    npc.wealth = Math.max(0, Math.round(Number(npc.wealth || 0) * (1 + rate / 100)));
-  }
-  addLog("Hafta ilerledi. Ekonomi motoru ve NPC siralamasi calisti."); saveGame(); render(); alert("Hafta ilerledi.");
-}
-
-function render() {
-  renderProfileSelect(); renderPanel(); renderProfileEdit(); renderAssets(); renderCompanies(); renderInvestments(); renderNpcs(); renderRanking(); renderLogs(); renderSettings(); saveGame();
-}
-function renderProfileSelect() { var select = document.getElementById("profileSelect"); select.innerHTML = ""; if (game.profiles.length === 0) { var o = document.createElement("option"); o.value = ""; o.textContent = "Profil yok"; select.appendChild(o); return; } for (var i = 0; i < game.profiles.length; i++) { var p = game.profiles[i]; var opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.name; if (p.id === game.activeProfileId) opt.selected = true; select.appendChild(opt); } }
-function renderPanel() { var p = getActiveProfile(); document.getElementById("activeProfile").textContent = p ? p.name : "Yok"; document.getElementById("wealthView").textContent = p ? money(profileWealth(p)) : money(0); document.getElementById("cashView").textContent = p ? money(p.cash) : money(0); document.getElementById("weekView").textContent = String(game.week); document.getElementById("jobView").textContent = p && p.job ? p.job : "Yok"; document.getElementById("sectorView").textContent = p && p.sector ? p.sector : "Yok"; document.getElementById("ageView").textContent = p ? String(p.age || 0) : "0"; var html = ""; for (var i = 0; i < Math.min(game.logs.length, 6); i++) html += "<p>" + game.logs[i] + "</p>"; document.getElementById("lastLogs").innerHTML = html || "<p class='muted'>Hareket yok.</p>"; }
-function renderProfileEdit() { var p = getActiveProfile(); if (!p) return; document.getElementById("editName").value = p.name || ""; document.getElementById("editAge").value = p.age || ""; document.getElementById("editJob").value = p.job || ""; document.getElementById("editSector").value = p.sector || ""; document.getElementById("editCash").value = p.cash || 0; document.getElementById("editSalary").value = p.weeklySalary || 0; document.getElementById("editExpense").value = p.weeklyExpense || 0; }
-function renderAssets() { var box = document.getElementById("assetList"); var p = getActiveProfile(); if (!p || p.assets.length === 0) { box.innerHTML = "<p class='muted'>Varlik yok.</p>"; return; } var html = ""; for (var i = 0; i < p.assets.length; i++) { var a = p.assets[i]; var rented = a.ownership === "rented"; var tag = rented ? "Kiralik" : "Satin Alinmis"; var displayValue = rented ? "Kiralik" : money(a.value); var actionSell = rented ? "<button class='warn' onclick='endAssetRent(\"" + a.id + "\")'>Kirayi Bitir</button>" : "<button class='sell' onclick='sellAsset(\"" + a.id + "\")'>Sat</button>"; var capitalBtn = rented ? "" : "<button class='warn' onclick='addAssetCapital(\"" + a.id + "\")'>Deger Ekle</button>"; html += "<div class='item'><div class='item-title'><b>" + a.name + "</b><span>" + displayValue + "</span></div><p class='muted'>" + a.type + " | " + tag + " | Haftalik: " + rangeNetText(a.income, a.expense) + "</p><div class='actions'><button class='secondary' onclick='editAsset(\"" + a.id + "\")'>Duzenle</button>" + capitalBtn + actionSell + "<button class='danger' onclick='deleteAsset(\"" + a.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
-function renderCompanies() { var box = document.getElementById("companyList"); var p = getActiveProfile(); if (!p || p.companies.length === 0) { box.innerHTML = "<p class='muted'>Sirket yok.</p>"; return; } var html = ""; for (var i = 0; i < p.companies.length; i++) { var c = p.companies[i]; var shareVal = Math.round(Number(c.value||0)*clampShare(c.share)/100); html += "<div class='item'><div class='item-title'><b>" + c.name + "</b><span>" + money(shareVal) + "</span></div><p class='muted'>" + c.sector + " | Hisse %" + c.share + " | Sirket degeri: " + money(c.value) + " | Haftalik kar: " + rangeNetText(c.income, c.expense) + "</p><div class='actions'><button class='secondary' onclick='editCompany(\"" + c.id + "\")'>Duzenle</button><button class='warn' onclick='addCapitalToCompany(\"" + c.id + "\")'>Sermaye</button><button class='sell' onclick='sellCompany(\"" + c.id + "\")'>Sat</button><button class='danger' onclick='deleteCompany(\"" + c.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
-function renderInvestments() { var box = document.getElementById("investmentList"); var p = getActiveProfile(); if (!p || p.investments.length === 0) { box.innerHTML = "<p class='muted'>Yatirim yok.</p>"; return; } var html = ""; for (var i = 0; i < p.investments.length; i++) { var inv = p.investments[i]; html += "<div class='item'><div class='item-title'><b>" + inv.name + "</b><span>" + money(inv.value) + "</span></div><p class='muted'>" + inv.type + "</p><div class='actions'><button class='secondary' onclick='editInvestment(\"" + inv.id + "\")'>Duzenle</button><button class='warn' onclick='addInvestmentCapital(\"" + inv.id + "\")'>Para Ekle</button><button class='sell' onclick='sellInvestment(\"" + inv.id + "\")'>Sat</button><button class='danger' onclick='deleteInvestment(\"" + inv.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
-function renderNpcs() { var box = document.getElementById("npcList"); if (!game.npcs || game.npcs.length === 0) { box.innerHTML = "<p class='muted'>NPC yok.</p>"; return; } var html = ""; for (var i = 0; i < game.npcs.length; i++) { var npc = game.npcs[i]; var ch = Number(npc.lastChange || 0); var sign = ch > 0 ? "+" : ""; html += "<div class='item'><div class='item-title'><b>" + npc.name + "</b><span>" + money(npc.wealth) + "</span></div><p class='muted'>" + (npc.sector || "Sektor yok") + " | Degisim araligi: %" + npc.minChange + " / %" + npc.maxChange + " | Son: " + sign + ch + "%</p><div class='actions'><button class='secondary' onclick='editNpc(\"" + npc.id + "\")'>Duzenle</button><button class='danger' onclick='deleteNpc(\"" + npc.id + "\")'>Sil</button><button class='warn' onclick='openTab(\"ranking\")'>Siralama</button></div></div>"; } box.innerHTML = html; }
-function renderRanking() { var box = document.getElementById("rankingList"); var arr = []; for (var i = 0; i < game.profiles.length; i++) arr.push({ name: game.profiles[i].name, wealth: profileWealth(game.profiles[i]), sector: game.profiles[i].sector || "" }); for (var n = 0; n < game.npcs.length; n++) arr.push({ name: game.npcs[n].name, wealth: Number(game.npcs[n].wealth || 0), sector: game.npcs[n].sector || "" }); if (arr.length === 0) { box.innerHTML = "<p class='muted'>Siralama yok.</p>"; return; } arr.sort(function(a,b){ return b.wealth - a.wealth; }); var html = ""; for (var j = 0; j < arr.length; j++) { var meta = arr[j].sector ? "<p class='muted'>" + arr[j].sector + "</p>" : ""; html += "<div class='item'><b>" + (j+1) + ". " + arr[j].name + "</b><br>" + money(arr[j].wealth) + meta + "</div>"; } box.innerHTML = html; }
-function renderLogs() { var box = document.getElementById("logList"); var html = ""; for (var i = 0; i < game.logs.length; i++) html += "<p>" + game.logs[i] + "</p>"; box.innerHTML = html || "<p class='muted'>Hareket yok.</p>"; }
-function renderSettings() { document.getElementById("currencySelect").value = game.currency; document.getElementById("minWageInput").value = Number(game.settings.weeklyMinimumWage || 0); document.getElementById("defaultExpenseInput").value = Number(game.settings.defaultWeeklyExpense || 0); document.getElementById("newProfilesMinWageSelect").value = game.settings.newProfilesUseMinimumWage || "no"; document.getElementById("negativeCashSelect").value = game.settings.allowNegativeCash; document.getElementById("fluctuationSelect").value = game.settings.valueFluctuation; document.getElementById("confirmSelect").value = game.settings.confirmActions; document.getElementById("npcMinSetting").value = Number(game.settings.npcMinChange || -3); document.getElementById("npcMaxSetting").value = Number(game.settings.npcMaxChange || 5); document.getElementById("logLimitInput").value = game.settings.logLimit; }
-
-function openTab(tabId) { var tabs = document.getElementsByClassName("tab"); var btns = document.getElementsByClassName("tabbtn"); var i; for (i = 0; i < tabs.length; i++) tabs[i].classList.remove("active"); for (i = 0; i < btns.length; i++) btns[i].classList.remove("active"); document.getElementById(tabId).classList.add("active"); for (i = 0; i < btns.length; i++) if (btns[i].getAttribute("data-tab") === tabId) btns[i].classList.add("active"); }
-function saveSettings() { game.currency = document.getElementById("currencySelect").value; game.settings.weeklyMinimumWage = Number(document.getElementById("minWageInput").value || 0); game.settings.defaultWeeklyExpense = Number(document.getElementById("defaultExpenseInput").value || 0); game.settings.newProfilesUseMinimumWage = document.getElementById("newProfilesMinWageSelect").value; game.settings.allowNegativeCash = document.getElementById("negativeCashSelect").value; game.settings.valueFluctuation = document.getElementById("fluctuationSelect").value; game.settings.confirmActions = document.getElementById("confirmSelect").value; game.settings.npcMinChange = Number(document.getElementById("npcMinSetting").value || -3); game.settings.npcMaxChange = Number(document.getElementById("npcMaxSetting").value || 5); game.settings.logLimit = Number(document.getElementById("logLimitInput").value || 80); if (game.settings.logLimit < 10) game.settings.logLimit = 10; addLog("Ayarlar kaydedildi."); saveGame(); render(); }
-function exportData() { document.getElementById("dataBox").value = JSON.stringify(game); }
-function importData() { try { var text = document.getElementById("dataBox").value.trim(); if (!text) { alert("Veri kutusu bos."); return; } game = JSON.parse(text); migrate(); addLog("Veri ice aktarildi."); saveGame(); render(); alert("Veri aktarildi."); } catch(e) { alert("Veri okunamadi."); } }
-function clearLogs() { game.logs = []; saveGame(); render(); }
-function resetGame() { if (!ask("Tum veriler silinsin mi?")) return; localStorage.removeItem(STORE_KEY); game = { version: "1.0", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } }; render(); }
-function bind() {
-  document.getElementById("addProfileBtn").addEventListener("click", addProfile);
-  document.getElementById("useMinWageBtn").addEventListener("click", applyMinWageToCreateForm);
-  document.getElementById("useDefaultExpenseBtn").addEventListener("click", applyDefaultExpenseToCreateForm);
-  document.getElementById("profileSelect").addEventListener("change", selectProfile);
-  document.getElementById("saveProfileBtn").addEventListener("click", saveProfileEdit);
-  document.getElementById("deleteProfileBtn").addEventListener("click", deleteActiveProfile);
-  document.getElementById("addAssetBtn").addEventListener("click", addAsset);
-  document.getElementById("addCompanyBtn").addEventListener("click", addCompany);
-  document.getElementById("addInvestmentBtn").addEventListener("click", addInvestment);
-  document.getElementById("addNpcBtn").addEventListener("click", addNpc);
-  document.getElementById("randomNpcBtn").addEventListener("click", function(){ addRandomNpcs(1); });
-  document.getElementById("random5NpcBtn").addEventListener("click", function(){ addRandomNpcs(5); });
-  document.getElementById("random10NpcBtn").addEventListener("click", function(){ addRandomNpcs(10); });
-  document.getElementById("nextWeekBtn").addEventListener("click", nextWeek);
-  document.getElementById("saveSettingsBtn").addEventListener("click", saveSettings);
-  document.getElementById("exportBtn").addEventListener("click", exportData);
-  document.getElementById("importBtn").addEventListener("click", importData);
-  document.getElementById("clearLogsBtn").addEventListener("click", clearLogs);
-  document.getElementById("resetBtn").addEventListener("click", resetGame);
-  var btns = document.getElementsByClassName("tabbtn");
-  for (var i = 0; i < btns.length; i++) btns[i].addEventListener("click", function(){ openTab(this.getAttribute("data-tab")); });
-}
-document.addEventListener("DOMContentLoaded", function(){ loadGame(); bind(); document.getElementById("status").textContent = "Motor aktif v1.0"; render(); });
+function exportData(){document.getElementById("importBox").value=JSON.stringify(game);}
+function importData(){try{game=JSON.parse(document.getElementById("importBox").value);fixGame();log("Veri ice aktarildi.");render();}catch(e){alert("JSON hatali.");}}
+function start(){load();setupSectors();document.getElementById("status").textContent="Motor aktif v1.0.1";document.getElementById("profileSelect").addEventListener("change",function(){game.activeProfileId=this.value;render();});document.getElementById("addProfileBtn").addEventListener("click",addProfile);document.getElementById("useMinWage").addEventListener("click",function(){document.getElementById("pSalary").value=game.settings.minWage;});document.getElementById("useDefaultExpense").addEventListener("click",function(){document.getElementById("pExpense").value=game.settings.defaultExpense;});document.getElementById("saveProfileBtn").addEventListener("click",saveProfile);document.getElementById("deleteProfileBtn").addEventListener("click",deleteProfile);document.getElementById("addAssetBtn").addEventListener("click",addAsset);document.getElementById("addCompanyBtn").addEventListener("click",addCompany);document.getElementById("addInvestmentBtn").addEventListener("click",addInvestment);document.getElementById("addNpcBtn").addEventListener("click",addNpc);document.getElementById("rnd1").addEventListener("click",function(){randomNpc();render();});document.getElementById("rnd5").addEventListener("click",function(){for(var i=0;i<5;i++)randomNpc();render();});document.getElementById("rnd10").addEventListener("click",function(){for(var i=0;i<10;i++)randomNpc();render();});document.getElementById("nextWeekBtn").addEventListener("click",nextWeek);document.getElementById("saveSettingsBtn").addEventListener("click",saveSettings);document.getElementById("toggleNegativeBtn").addEventListener("click",function(){game.settings.blockNegative=!game.settings.blockNegative;render();});document.getElementById("toggleMarketBtn").addEventListener("click",function(){game.settings.marketChanges=!game.settings.marketChanges;render();});document.getElementById("exportBtn").addEventListener("click",exportData);document.getElementById("importBtn").addEventListener("click",importData);document.getElementById("resetBtn").addEventListener("click",function(){if(confirm("Tum veriler silinsin mi?")){localStorage.removeItem(STORAGE_KEY);game={version:"v1.0.1",week:1,activeProfileId:null,settings:{currency:"TL",minWage:5000,defaultExpense:2000,logLimit:80,blockNegative:false,marketChanges:true,npcMin:-3,npcMax:6},profiles:[],npcs:[],logs:[]};render();}});var bs=document.getElementsByClassName("tabbtn");for(var i=0;i<bs.length;i++){bs[i].addEventListener("click",function(){var id=this.getAttribute("data-tab");var tabs=document.getElementsByClassName("tab");var btns=document.getElementsByClassName("tabbtn");for(var j=0;j<tabs.length;j++)tabs[j].classList.remove("active");for(j=0;j<btns.length;j++)btns[j].classList.remove("active");document.getElementById(id).classList.add("active");this.classList.add("active");});}render();}
+document.addEventListener("DOMContentLoaded",start);
 </script>
 </body>
 </html>
