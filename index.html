@@ -46,7 +46,7 @@
 <div class="app">
   <div class="card">
     <h1>Servet Imparatorlugu</h1>
-    <p class="muted">v0.8 - Rastgele NPC + aralikli gelir/gider</p>
+    <p class="muted">v0.9 - Siralama temizligi + profil sektoru + ekleme sistemi</p>
     <p id="status" class="status">Motor yukleniyor...</p>
   </div>
 
@@ -58,6 +58,7 @@
       <input id="profileAge" type="number" placeholder="Yas">
     </div>
     <input id="profileJob" type="text" placeholder="Maasli meslek">
+    <input id="profileSector" type="text" placeholder="Profil sektoru (ornegin Sanayi, Finans, Girisimci)">
     <div class="two">
       <input id="profileCash" type="number" placeholder="Baslangic nakit">
       <input id="profileSalary" type="number" placeholder="Haftalik maas">
@@ -89,6 +90,7 @@
       <div class="stat">Nakit<b id="cashView">0</b></div>
       <div class="stat">Hafta<b id="weekView">1</b></div>
       <div class="stat">Meslek<b id="jobView">Yok</b></div>
+      <div class="stat">Sektor<b id="sectorView">Yok</b></div>
       <div class="stat">Yas<b id="ageView">0</b></div>
     </div>
     <h3>Son Hareketler</h3>
@@ -100,6 +102,7 @@
     <input id="editName" type="text" placeholder="Ad">
     <input id="editAge" type="number" placeholder="Yas">
     <input id="editJob" type="text" placeholder="Meslek">
+    <input id="editSector" type="text" placeholder="Sektor">
     <input id="editCash" type="number" placeholder="Nakit">
     <input id="editSalary" type="number" placeholder="Haftalik maas">
     <input id="editExpense" type="number" placeholder="Haftalik gider (5000 veya 5000-12000)">
@@ -220,7 +223,7 @@
     <label class="muted">Hareket gecmisi limiti</label>
     <input id="logLimitInput" type="number" placeholder="80">
 
-    <p class="muted">Surum: v0.8 | Otomatik kayit: Acik | Kayit yeri: Bu tarayici</p>
+    <p class="muted">Surum: v0.9 | Otomatik kayit: Acik | Kayit yeri: Bu tarayici</p>
     <button id="saveSettingsBtn" type="button">Ayarlari Kaydet</button>
     <button id="exportBtn" type="button" class="secondary">Veriyi Disa Aktar</button>
     <textarea id="dataBox" rows="6" placeholder="Veri burada gorunur veya buraya yapistirilir"></textarea>
@@ -237,7 +240,7 @@ window.onerror = function(message, source, line) {
 };
 
 var STORE_KEY = "servet_game_v04";
-var game = { version: "0.8", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } };
+var game = { version: "0.9", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } };
 
 function uid() { return String(Date.now()) + String(Math.floor(Math.random() * 1000)); }
 function sym() { if (game.currency === "USD") return "$"; if (game.currency === "TRY") return "TL"; return "EUR"; }
@@ -288,7 +291,7 @@ function migrate() {
   if (!game.settings.newProfilesUseMinimumWage) game.settings.newProfilesUseMinimumWage = "no";
   if (game.settings.npcMinChange === undefined) game.settings.npcMinChange = -3;
   if (game.settings.npcMaxChange === undefined) game.settings.npcMaxChange = 5;
-  game.version = "0.8";
+  game.version = "0.9";
   for (var i = 0; i < game.profiles.length; i++) {
     var p = game.profiles[i];
     if (!p.assets) p.assets = [];
@@ -296,6 +299,7 @@ function migrate() {
     if (!p.investments) p.investments = [];
     if (p.age === undefined) p.age = 0;
     if (p.job === undefined) p.job = "";
+    if (p.sector === undefined) p.sector = "";
     if (p.weeklySalary === undefined) p.weeklySalary = 0;
     if (p.weeklyExpense === undefined) p.weeklyExpense = 0;
   }
@@ -332,9 +336,9 @@ function addProfile() {
   if (game.settings.newProfilesUseMinimumWage === "yes" && salaryValue === 0) salaryValue = Number(game.settings.weeklyMinimumWage || 0);
   var expenseValue = Number(document.getElementById("profileExpense").value || 0);
   if (expenseValue === 0) expenseValue = Number(game.settings.defaultWeeklyExpense || 0);
-  var p = { id: uid(), name: name, age: Number(document.getElementById("profileAge").value || 0), job: document.getElementById("profileJob").value.trim(), cash: Number(document.getElementById("profileCash").value || 0), weeklySalary: salaryValue, weeklyExpense: expenseValue, assets: [], companies: [], investments: [] };
+  var p = { id: uid(), name: name, age: Number(document.getElementById("profileAge").value || 0), job: document.getElementById("profileJob").value.trim(), sector: document.getElementById("profileSector").value.trim(), cash: Number(document.getElementById("profileCash").value || 0), weeklySalary: salaryValue, weeklyExpense: expenseValue, assets: [], companies: [], investments: [] };
   game.profiles.push(p); game.activeProfileId = p.id; addLog("Profil olusturuldu: " + p.name);
-  document.getElementById("profileName").value = ""; document.getElementById("profileAge").value = ""; document.getElementById("profileJob").value = ""; document.getElementById("profileCash").value = ""; document.getElementById("profileSalary").value = ""; document.getElementById("profileExpense").value = "";
+  document.getElementById("profileName").value = ""; document.getElementById("profileAge").value = ""; document.getElementById("profileJob").value = ""; document.getElementById("profileSector").value = ""; document.getElementById("profileCash").value = ""; document.getElementById("profileSalary").value = ""; document.getElementById("profileExpense").value = "";
   saveGame(); render(); alert("Profil olusturuldu.");
 }
 function selectProfile() { game.activeProfileId = document.getElementById("profileSelect").value; saveGame(); render(); }
@@ -343,6 +347,7 @@ function saveProfileEdit() {
   p.name = document.getElementById("editName").value.trim() || p.name;
   p.age = Number(document.getElementById("editAge").value || 0);
   p.job = document.getElementById("editJob").value.trim();
+  p.sector = document.getElementById("editSector").value.trim();
   p.cash = Number(document.getElementById("editCash").value || 0);
   p.weeklySalary = Number(document.getElementById("editSalary").value || 0);
   p.weeklyExpense = Number(document.getElementById("editExpense").value || 0);
@@ -360,18 +365,20 @@ function addAsset() { var p = requireProfile(); if (!p) return; var name = docum
 function clearAssetForm() { document.getElementById("assetName").value = ""; document.getElementById("assetValue").value = ""; document.getElementById("assetIncome").value = ""; document.getElementById("assetExpense").value = ""; }
 function sellAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (!ask(a.name + " satilsin mi?")) return; p.cash += Number(a.value || 0); p.assets = p.assets.filter(function(x){ return x.id !== id; }); addLog("Varlik satildi: " + a.name + " +" + money(a.value)); saveGame(); render(); }
 function deleteAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; if (!ask(a.name + " silinsin mi? Para eklenmez.")) return; p.assets = p.assets.filter(function(x){ return x.id !== id; }); addLog("Varlik silindi: " + a.name); saveGame(); render(); }
-function editAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; var name = prompt("Yeni ad", a.name); if (name === null) return; var value = prompt("Yeni deger", a.value); if (value === null) return; var income = prompt("Haftalik gelir veya aralik", a.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", a.expense || 0); if (expense === null) return; a.name = name.trim() || a.name; a.value = Number(value || 0); a.income = String(income || 0).trim(); a.expense = String(expense || 0).trim(); addLog("Varlik duzenlendi: " + a.name); saveGame(); render(); }
+function editAsset(id) { var p = requireProfile(); if (!p) return; var a = p.assets.find(function(x){ return x.id === id; }); if (!a) return; var oldValue = Number(a.value || 0); var name = prompt("Yeni ad", a.name); if (name === null) return; var value = prompt("Yeni deger", a.value); if (value === null) return; var newValue = Number(value || 0); var delta = Math.round(newValue - oldValue); if (delta > 0) { if (!spendCash(p, delta, "Varlik deger artisi / ek alim")) return; addLog("Varliga ek alim yapildi: " + a.name + " -" + money(delta)); } var income = prompt("Haftalik gelir veya aralik", a.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", a.expense || 0); if (expense === null) return; a.name = name.trim() || a.name; a.value = newValue; a.income = String(income || 0).trim(); a.expense = String(expense || 0).trim(); addLog("Varlik duzenlendi: " + a.name); saveGame(); render(); }
 
 function addCompany() { var p = requireProfile(); if (!p) return; var name = document.getElementById("companyName").value.trim(); if (!name) { alert("Sirket adi yaz."); return; } var value = Number(document.getElementById("companyValue").value || 0); var share = clampShare(document.getElementById("companyShare").value || 100); var cost = Math.round(value * share / 100); if (!spendCash(p, cost, "Sirket / hisse satin alma")) return; var c = { id: uid(), sector: document.getElementById("companySector").value, name: name, value: value, share: share, income: document.getElementById("companyIncome").value.trim(), expense: document.getElementById("companyExpense").value.trim() }; p.companies.push(c); addLog("Sirket / hisse alindi: " + c.name + " -" + money(cost)); clearCompanyForm(); saveGame(); render(); }
 function clearCompanyForm() { document.getElementById("companyName").value = ""; document.getElementById("companyValue").value = ""; document.getElementById("companyShare").value = "100"; document.getElementById("companyIncome").value = ""; document.getElementById("companyExpense").value = ""; }
 function sellCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " satilsin mi?")) return; var sale = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); p.cash += sale; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket satildi: " + c.name + " +" + money(sale)); saveGame(); render(); }
 function deleteCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " silinsin mi? Para eklenmez.")) return; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket silindi: " + c.name); saveGame(); render(); }
-function editCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var name = prompt("Yeni ad", c.name); if (name === null) return; var value = prompt("Yeni deger", c.value); if (value === null) return; var share = prompt("Hisse orani %", c.share); if (share === null) return; var income = prompt("Haftalik gelir veya aralik", c.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", c.expense || 0); if (expense === null) return; c.name = name.trim() || c.name; c.value = Number(value || 0); c.share = clampShare(share); c.income = String(income || 0).trim(); c.expense = String(expense || 0).trim(); addLog("Sirket duzenlendi: " + c.name); saveGame(); render(); }
+function editCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var oldOwnedValue = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); var name = prompt("Yeni ad", c.name); if (name === null) return; var value = prompt("Yeni deger", c.value); if (value === null) return; var share = prompt("Hisse orani %", c.share); if (share === null) return; var newValue = Number(value || 0); var newShare = clampShare(share); var newOwnedValue = Math.round(newValue * newShare / 100); var delta = newOwnedValue - oldOwnedValue; if (delta > 0) { if (!spendCash(p, delta, "Sirket degeri / hisse artisi")) return; addLog("Sirket hissesine ekleme yapildi: " + c.name + " -" + money(delta)); } var income = prompt("Haftalik gelir veya aralik", c.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", c.expense || 0); if (expense === null) return; c.name = name.trim() || c.name; c.value = newValue; c.share = newShare; c.income = String(income || 0).trim(); c.expense = String(expense || 0).trim(); addLog("Sirket duzenlendi: " + c.name); saveGame(); render(); }
+function addCapitalToCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var amount = Number(prompt("Sirket hissesine eklenecek nakit", 0) || 0); amount = Math.round(amount); if (amount <= 0) return; if (!spendCash(p, amount, "Sirkete sermaye ekleme")) return; var share = clampShare(c.share); if (share <= 0) share = 100; c.value = Math.round(Number(c.value || 0) + (amount * 100 / share)); addLog("Sirkete sermaye eklendi: " + c.name + " -" + money(amount)); saveGame(); render(); }
 
 function addInvestment() { var p = requireProfile(); if (!p) return; var name = document.getElementById("investmentName").value.trim(); if (!name) { alert("Yatirim adi yaz."); return; } var value = Number(document.getElementById("investmentValue").value || 0); if (!spendCash(p, value, "Yatirim satin alma")) return; var inv = { id: uid(), type: document.getElementById("investmentType").value, name: name, value: value }; p.investments.push(inv); addLog("Yatirim alindi: " + inv.name + " -" + money(value)); document.getElementById("investmentName").value = ""; document.getElementById("investmentValue").value = ""; saveGame(); render(); }
 function sellInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; if (!ask(inv.name + " satilsin mi?")) return; p.cash += Number(inv.value || 0); p.investments = p.investments.filter(function(x){ return x.id !== id; }); addLog("Yatirim satildi: " + inv.name + " +" + money(inv.value)); saveGame(); render(); }
 function deleteInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; if (!ask(inv.name + " silinsin mi? Para eklenmez.")) return; p.investments = p.investments.filter(function(x){ return x.id !== id; }); addLog("Yatirim silindi: " + inv.name); saveGame(); render(); }
-function editInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var name = prompt("Yeni ad", inv.name); if (name === null) return; var value = prompt("Yeni deger", inv.value); if (value === null) return; inv.name = name.trim() || inv.name; inv.value = Number(value || 0); addLog("Yatirim duzenlendi: " + inv.name); saveGame(); render(); }
+function editInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var oldValue = Number(inv.value || 0); var name = prompt("Yeni ad", inv.name); if (name === null) return; var value = prompt("Yeni deger", inv.value); if (value === null) return; var newValue = Number(value || 0); var delta = Math.round(newValue - oldValue); if (delta > 0) { if (!spendCash(p, delta, "Yatirim ekleme")) return; addLog("Yatirima ekleme yapildi: " + inv.name + " -" + money(delta)); } inv.name = name.trim() || inv.name; inv.value = newValue; addLog("Yatirim duzenlendi: " + inv.name); saveGame(); render(); }
+function addToInvestment(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var amount = Number(prompt("Yatirima eklenecek tutar", 0) || 0); amount = Math.round(amount); if (amount <= 0) return; if (!spendCash(p, amount, "Yatirima ekleme")) return; inv.value = Math.round(Number(inv.value || 0) + amount); addLog("Yatirima ekleme yapildi: " + inv.name + " -" + money(amount)); saveGame(); render(); }
 
 
 var randomFirstNames = ["Alexander", "Marcus", "Victor", "Leon", "Arif", "Batur", "Murat", "Emir", "Selim", "Deniz", "Selin", "Elena", "Leyla", "Derya", "Ada", "Nora", "Kerem", "Atlas", "Yigit", "Alp"];
@@ -484,13 +491,13 @@ function render() {
   renderProfileSelect(); renderPanel(); renderProfileEdit(); renderAssets(); renderCompanies(); renderInvestments(); renderNpcs(); renderRanking(); renderLogs(); renderSettings(); saveGame();
 }
 function renderProfileSelect() { var select = document.getElementById("profileSelect"); select.innerHTML = ""; if (game.profiles.length === 0) { var o = document.createElement("option"); o.value = ""; o.textContent = "Profil yok"; select.appendChild(o); return; } for (var i = 0; i < game.profiles.length; i++) { var p = game.profiles[i]; var opt = document.createElement("option"); opt.value = p.id; opt.textContent = p.name; if (p.id === game.activeProfileId) opt.selected = true; select.appendChild(opt); } }
-function renderPanel() { var p = getActiveProfile(); document.getElementById("activeProfile").textContent = p ? p.name : "Yok"; document.getElementById("wealthView").textContent = p ? money(profileWealth(p)) : money(0); document.getElementById("cashView").textContent = p ? money(p.cash) : money(0); document.getElementById("weekView").textContent = String(game.week); document.getElementById("jobView").textContent = p && p.job ? p.job : "Yok"; document.getElementById("ageView").textContent = p ? String(p.age || 0) : "0"; var html = ""; for (var i = 0; i < Math.min(game.logs.length, 6); i++) html += "<p>" + game.logs[i] + "</p>"; document.getElementById("lastLogs").innerHTML = html || "<p class='muted'>Hareket yok.</p>"; }
-function renderProfileEdit() { var p = getActiveProfile(); if (!p) return; document.getElementById("editName").value = p.name || ""; document.getElementById("editAge").value = p.age || ""; document.getElementById("editJob").value = p.job || ""; document.getElementById("editCash").value = p.cash || 0; document.getElementById("editSalary").value = p.weeklySalary || 0; document.getElementById("editExpense").value = p.weeklyExpense || 0; }
+function renderPanel() { var p = getActiveProfile(); document.getElementById("activeProfile").textContent = p ? p.name : "Yok"; document.getElementById("wealthView").textContent = p ? money(profileWealth(p)) : money(0); document.getElementById("cashView").textContent = p ? money(p.cash) : money(0); document.getElementById("weekView").textContent = String(game.week); document.getElementById("jobView").textContent = p && p.job ? p.job : "Yok"; document.getElementById("sectorView").textContent = p && p.sector ? p.sector : "Yok"; document.getElementById("ageView").textContent = p ? String(p.age || 0) : "0"; var html = ""; for (var i = 0; i < Math.min(game.logs.length, 6); i++) html += "<p>" + game.logs[i] + "</p>"; document.getElementById("lastLogs").innerHTML = html || "<p class='muted'>Hareket yok.</p>"; }
+function renderProfileEdit() { var p = getActiveProfile(); if (!p) return; document.getElementById("editName").value = p.name || ""; document.getElementById("editAge").value = p.age || ""; document.getElementById("editJob").value = p.job || ""; document.getElementById("editSector").value = p.sector || ""; document.getElementById("editCash").value = p.cash || 0; document.getElementById("editSalary").value = p.weeklySalary || 0; document.getElementById("editExpense").value = p.weeklyExpense || 0; }
 function renderAssets() { var box = document.getElementById("assetList"); var p = getActiveProfile(); if (!p || p.assets.length === 0) { box.innerHTML = "<p class='muted'>Varlik yok.</p>"; return; } var html = ""; for (var i = 0; i < p.assets.length; i++) { var a = p.assets[i]; html += "<div class='item'><div class='item-title'><b>" + a.name + "</b><span>" + money(a.value) + "</span></div><p class='muted'>" + a.type + " | Haftalik: " + rangeNetText(a.income, a.expense) + "</p><div class='actions'><button class='secondary' onclick='editAsset(\"" + a.id + "\")'>Duzenle</button><button class='sell' onclick='sellAsset(\"" + a.id + "\")'>Sat</button><button class='danger' onclick='deleteAsset(\"" + a.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
 function renderCompanies() { var box = document.getElementById("companyList"); var p = getActiveProfile(); if (!p || p.companies.length === 0) { box.innerHTML = "<p class='muted'>Sirket yok.</p>"; return; } var html = ""; for (var i = 0; i < p.companies.length; i++) { var c = p.companies[i]; var shareVal = Math.round(Number(c.value||0)*clampShare(c.share)/100); html += "<div class='item'><div class='item-title'><b>" + c.name + "</b><span>" + money(shareVal) + "</span></div><p class='muted'>" + c.sector + " | Hisse %" + c.share + " | Sirket degeri: " + money(c.value) + " | Haftalik kar: " + rangeNetText(c.income, c.expense) + "</p><div class='actions'><button class='secondary' onclick='editCompany(\"" + c.id + "\")'>Duzenle</button><button class='sell' onclick='sellCompany(\"" + c.id + "\")'>Sat</button><button class='danger' onclick='deleteCompany(\"" + c.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
 function renderInvestments() { var box = document.getElementById("investmentList"); var p = getActiveProfile(); if (!p || p.investments.length === 0) { box.innerHTML = "<p class='muted'>Yatirim yok.</p>"; return; } var html = ""; for (var i = 0; i < p.investments.length; i++) { var inv = p.investments[i]; html += "<div class='item'><div class='item-title'><b>" + inv.name + "</b><span>" + money(inv.value) + "</span></div><p class='muted'>" + inv.type + "</p><div class='actions'><button class='secondary' onclick='editInvestment(\"" + inv.id + "\")'>Duzenle</button><button class='sell' onclick='sellInvestment(\"" + inv.id + "\")'>Sat</button><button class='danger' onclick='deleteInvestment(\"" + inv.id + "\")'>Sil</button></div></div>"; } box.innerHTML = html; }
 function renderNpcs() { var box = document.getElementById("npcList"); if (!game.npcs || game.npcs.length === 0) { box.innerHTML = "<p class='muted'>NPC yok.</p>"; return; } var html = ""; for (var i = 0; i < game.npcs.length; i++) { var npc = game.npcs[i]; var ch = Number(npc.lastChange || 0); var sign = ch > 0 ? "+" : ""; html += "<div class='item'><div class='item-title'><b>" + npc.name + "</b><span>" + money(npc.wealth) + "</span></div><p class='muted'>" + (npc.sector || "Sektor yok") + " | Degisim araligi: %" + npc.minChange + " / %" + npc.maxChange + " | Son: " + sign + ch + "%</p><div class='actions'><button class='secondary' onclick='editNpc(\"" + npc.id + "\")'>Duzenle</button><button class='danger' onclick='deleteNpc(\"" + npc.id + "\")'>Sil</button><button class='warn' onclick='openTab(\"ranking\")'>Siralama</button></div></div>"; } box.innerHTML = html; }
-function renderRanking() { var box = document.getElementById("rankingList"); var arr = []; for (var i = 0; i < game.profiles.length; i++) arr.push({ name: game.profiles[i].name, type: "Profil", wealth: profileWealth(game.profiles[i]) }); for (var n = 0; n < game.npcs.length; n++) arr.push({ name: game.npcs[n].name, type: "NPC", wealth: Number(game.npcs[n].wealth || 0), sector: game.npcs[n].sector || "" }); if (arr.length === 0) { box.innerHTML = "<p class='muted'>Siralama yok.</p>"; return; } arr.sort(function(a,b){ return b.wealth - a.wealth; }); var html = ""; for (var j = 0; j < arr.length; j++) html += "<div class='item'><b>" + (j+1) + ". " + arr[j].name + "</b><br>" + money(arr[j].wealth) + "<p class='muted'>" + arr[j].type + (arr[j].sector ? " | " + arr[j].sector : "") + "</p></div>"; box.innerHTML = html; }
+function renderRanking() { var box = document.getElementById("rankingList"); var arr = []; for (var i = 0; i < game.profiles.length; i++) arr.push({ name: game.profiles[i].name, wealth: profileWealth(game.profiles[i]), sector: game.profiles[i].sector || "" }); for (var n = 0; n < game.npcs.length; n++) arr.push({ name: game.npcs[n].name, wealth: Number(game.npcs[n].wealth || 0), sector: game.npcs[n].sector || "" }); if (arr.length === 0) { box.innerHTML = "<p class='muted'>Siralama yok.</p>"; return; } arr.sort(function(a,b){ return b.wealth - a.wealth; }); var html = ""; for (var j = 0; j < arr.length; j++) { var meta = arr[j].sector ? "<p class='muted'>" + arr[j].sector + "</p>" : ""; html += "<div class='item'><b>" + (j+1) + ". " + arr[j].name + "</b><br>" + money(arr[j].wealth) + meta + "</div>"; } box.innerHTML = html; }
 function renderLogs() { var box = document.getElementById("logList"); var html = ""; for (var i = 0; i < game.logs.length; i++) html += "<p>" + game.logs[i] + "</p>"; box.innerHTML = html || "<p class='muted'>Hareket yok.</p>"; }
 function renderSettings() { document.getElementById("currencySelect").value = game.currency; document.getElementById("minWageInput").value = Number(game.settings.weeklyMinimumWage || 0); document.getElementById("defaultExpenseInput").value = Number(game.settings.defaultWeeklyExpense || 0); document.getElementById("newProfilesMinWageSelect").value = game.settings.newProfilesUseMinimumWage || "no"; document.getElementById("negativeCashSelect").value = game.settings.allowNegativeCash; document.getElementById("fluctuationSelect").value = game.settings.valueFluctuation; document.getElementById("confirmSelect").value = game.settings.confirmActions; document.getElementById("npcMinSetting").value = Number(game.settings.npcMinChange || -3); document.getElementById("npcMaxSetting").value = Number(game.settings.npcMaxChange || 5); document.getElementById("logLimitInput").value = game.settings.logLimit; }
 
@@ -499,7 +506,7 @@ function saveSettings() { game.currency = document.getElementById("currencySelec
 function exportData() { document.getElementById("dataBox").value = JSON.stringify(game); }
 function importData() { try { var text = document.getElementById("dataBox").value.trim(); if (!text) { alert("Veri kutusu bos."); return; } game = JSON.parse(text); migrate(); addLog("Veri ice aktarildi."); saveGame(); render(); alert("Veri aktarildi."); } catch(e) { alert("Veri okunamadi."); } }
 function clearLogs() { game.logs = []; saveGame(); render(); }
-function resetGame() { if (!ask("Tum veriler silinsin mi?")) return; localStorage.removeItem(STORE_KEY); game = { version: "0.8", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } }; render(); }
+function resetGame() { if (!ask("Tum veriler silinsin mi?")) return; localStorage.removeItem(STORE_KEY); game = { version: "0.9", week: 1, currency: "EUR", activeProfileId: null, profiles: [], npcs: [], logs: [], settings: { npcMinChange: -3, npcMaxChange: 5, allowNegativeCash: "no", valueFluctuation: "yes", confirmActions: "yes", logLimit: 80, weeklyMinimumWage: 500, defaultWeeklyExpense: 0, newProfilesUseMinimumWage: "no" } }; render(); }
 function bind() {
   document.getElementById("addProfileBtn").addEventListener("click", addProfile);
   document.getElementById("useMinWageBtn").addEventListener("click", applyMinWageToCreateForm);
@@ -523,7 +530,7 @@ function bind() {
   var btns = document.getElementsByClassName("tabbtn");
   for (var i = 0; i < btns.length; i++) btns[i].addEventListener("click", function(){ openTab(this.getAttribute("data-tab")); });
 }
-document.addEventListener("DOMContentLoaded", function(){ loadGame(); bind(); document.getElementById("status").textContent = "Motor aktif v0.8"; render(); });
+document.addEventListener("DOMContentLoaded", function(){ loadGame(); bind(); document.getElementById("status").textContent = "Motor aktif v0.9"; render(); });
 </script>
 </body>
 </html>
