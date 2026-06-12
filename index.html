@@ -46,7 +46,7 @@
 <div class="app">
   <div class="card">
     <h1>Servet Imparatorlugu</h1>
-    <p class="muted">v0.9 - Siralama temizligi + profil sektoru + ekleme sistemi</p>
+    <p class="muted">v0.9.1 - Sermaye ekle + para ekle duzeltmesi</p>
     <p id="status" class="status">Motor yukleniyor...</p>
   </div>
 
@@ -223,7 +223,7 @@
     <label class="muted">Hareket gecmisi limiti</label>
     <input id="logLimitInput" type="number" placeholder="80">
 
-    <p class="muted">Surum: v0.9 | Otomatik kayit: Acik | Kayit yeri: Bu tarayici</p>
+    <p class="muted">Surum: v0.9.1 | Otomatik kayit: Acik | Kayit yeri: Bu tarayici</p>
     <button id="saveSettingsBtn" type="button">Ayarlari Kaydet</button>
     <button id="exportBtn" type="button" class="secondary">Veriyi Disa Aktar</button>
     <textarea id="dataBox" rows="6" placeholder="Veri burada gorunur veya buraya yapistirilir"></textarea>
@@ -369,6 +369,11 @@ function editAsset(id) { var p = requireProfile(); if (!p) return; var a = p.ass
 
 function addCompany() { var p = requireProfile(); if (!p) return; var name = document.getElementById("companyName").value.trim(); if (!name) { alert("Sirket adi yaz."); return; } var value = Number(document.getElementById("companyValue").value || 0); var share = clampShare(document.getElementById("companyShare").value || 100); var cost = Math.round(value * share / 100); if (!spendCash(p, cost, "Sirket / hisse satin alma")) return; var c = { id: uid(), sector: document.getElementById("companySector").value, name: name, value: value, share: share, income: document.getElementById("companyIncome").value.trim(), expense: document.getElementById("companyExpense").value.trim() }; p.companies.push(c); addLog("Sirket / hisse alindi: " + c.name + " -" + money(cost)); clearCompanyForm(); saveGame(); render(); }
 function clearCompanyForm() { document.getElementById("companyName").value = ""; document.getElementById("companyValue").value = ""; document.getElementById("companyShare").value = "100"; document.getElementById("companyIncome").value = ""; document.getElementById("companyExpense").value = ""; }
+
+function addCompanyCapital(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var amountText = prompt("Eklenecek sermaye", "0"); if (amountText === null) return; var amount = Math.round(Number(amountText || 0)); if (amount <= 0) { alert("Gecerli bir tutar yaz."); return; } if (!spendCash(p, amount, "Sermaye ekleme")) return; c.value = Math.round(Number(c.value || 0) + amount); addLog("Sirket sermayesi eklendi: " + c.name + " -" + money(amount)); saveGame(); render(); }
+
+function addInvestmentCapital(id) { var p = requireProfile(); if (!p) return; var inv = p.investments.find(function(x){ return x.id === id; }); if (!inv) return; var amountText = prompt("Yatirima eklenecek para", "0"); if (amountText === null) return; var amount = Math.round(Number(amountText || 0)); if (amount <= 0) { alert("Gecerli bir tutar yaz."); return; } if (!spendCash(p, amount, "Yatirima para ekleme")) return; inv.value = Math.round(Number(inv.value || 0) + amount); addLog("Yatirima para eklendi: " + inv.name + " -" + money(amount)); saveGame(); render(); }
+
 function sellCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " satilsin mi?")) return; var sale = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); p.cash += sale; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket satildi: " + c.name + " +" + money(sale)); saveGame(); render(); }
 function deleteCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; if (!ask(c.name + " silinsin mi? Para eklenmez.")) return; p.companies = p.companies.filter(function(x){ return x.id !== id; }); addLog("Sirket silindi: " + c.name); saveGame(); render(); }
 function editCompany(id) { var p = requireProfile(); if (!p) return; var c = p.companies.find(function(x){ return x.id === id; }); if (!c) return; var oldOwnedValue = Math.round(Number(c.value || 0) * clampShare(c.share) / 100); var name = prompt("Yeni ad", c.name); if (name === null) return; var value = prompt("Yeni deger", c.value); if (value === null) return; var share = prompt("Hisse orani %", c.share); if (share === null) return; var newValue = Number(value || 0); var newShare = clampShare(share); var newOwnedValue = Math.round(newValue * newShare / 100); var delta = newOwnedValue - oldOwnedValue; if (delta > 0) { if (!spendCash(p, delta, "Sirket degeri / hisse artisi")) return; addLog("Sirket hissesine ekleme yapildi: " + c.name + " -" + money(delta)); } var income = prompt("Haftalik gelir veya aralik", c.income || 0); if (income === null) return; var expense = prompt("Haftalik gider veya aralik", c.expense || 0); if (expense === null) return; c.name = name.trim() || c.name; c.value = newValue; c.share = newShare; c.income = String(income || 0).trim(); c.expense = String(expense || 0).trim(); addLog("Sirket duzenlendi: " + c.name); saveGame(); render(); }
@@ -530,7 +535,7 @@ function bind() {
   var btns = document.getElementsByClassName("tabbtn");
   for (var i = 0; i < btns.length; i++) btns[i].addEventListener("click", function(){ openTab(this.getAttribute("data-tab")); });
 }
-document.addEventListener("DOMContentLoaded", function(){ loadGame(); bind(); document.getElementById("status").textContent = "Motor aktif v0.9"; render(); });
+document.addEventListener("DOMContentLoaded", function(){ loadGame(); bind(); document.getElementById("status").textContent = "Motor aktif v0.9.1"; render(); });
 </script>
 </body>
 </html>
