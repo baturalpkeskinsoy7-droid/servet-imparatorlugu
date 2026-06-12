@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Servet Imparatorlugu v1.1</title>
+<title>Servet Imparatorlugu v1.1.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#07101c;color:#f8fafc;font-family:Arial,sans-serif}.app{max-width:720px;margin:0 auto;padding:18px}.hero,.card{background:#111b2b;border:1px solid #2a3a55;border-radius:22px;padding:18px;margin-bottom:16px}h1{margin:0 0 8px;font-size:34px}h2{margin:0 0 14px;font-size:28px}.muted{color:#a3adbd}.ok{color:#22c55e;font-weight:800}.err{color:#fb7185;font-weight:800}input,select,textarea,button{width:100%;padding:14px;border-radius:14px;border:1px solid #354760;background:#080d1d;color:#fff;font-size:17px;margin-top:10px}button{background:#2563eb;border:0;font-weight:800}button.gray{background:#334155}button.green{background:#15803d}button.red{background:#991b1b}.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}.tabbtn{background:#1f2937}.tabbtn.active{background:#2563eb}.tab{display:none}.tab.active{display:block}.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.item{background:#080d1d;border:1px solid #2a3a55;border-radius:18px;padding:14px;margin-top:12px}.row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}.stat{background:#080d1d;border:1px solid #2a3a55;border-radius:16px;padding:14px}.stat b{font-size:22px}.right{float:right}.small{font-size:14px}.full{grid-column:1/-1}@media(max-width:520px){.tabs{grid-template-columns:repeat(3,1fr)}h1{font-size:30px}.row{grid-template-columns:1fr 1fr}.row .red{grid-column:auto}.grid{grid-template-columns:1fr 1fr}}
 </style>
@@ -12,7 +12,7 @@
 <div class="app">
 <div class="hero">
 <h1>Servet Imparatorlugu</h1>
-<div class="muted">v1.1 Banka Sistemi</div>
+<div class="muted">v1.1.1 Banka Hotfix</div>
 <div id="status" class="ok">Motor yukleniyor...</div>
 </div>
 
@@ -128,7 +128,17 @@ function saveProfile(){var p=active();if(!p)return;p.name=document.getElementByI
 function deleteProfile(){var p=active();if(!p)return;if(!confirm("Profil silinsin mi?"))return;game.profiles=game.profiles.filter(function(x){return x.id!==p.id;});game.activeProfileId=game.profiles[0]?game.profiles[0].id:null;log(p.name+" profili silindi.");render();}
 
 function addAsset(){var p=active();if(!p){alert("Once profil olustur.");return;}var own=document.getElementById("assetOwnership").value;var val=n(document.getElementById("assetValue").value);var a={id:uid(),type:document.getElementById("assetType").value,ownership:own,name:document.getElementById("assetName").value.trim(),value:val,income:document.getElementById("assetIncome").value.trim(),expense:document.getElementById("assetExpense").value.trim()};if(!a.name){alert("Varlik adi yaz.");return;}if(own==="buy"){if(!charge(p,val,a.name+" satin alindi."))return;}else{log(a.name+" kiralandi.");}p.assets.push(a);["assetName","assetValue","assetIncome","assetExpense"].forEach(function(id){document.getElementById(id).value="";});render();}
-function renderAssets(){var p=active(),box=document.getElementById("assetList");box.innerHTML="";if(!p||p.assets.length===0){box.innerHTML="<p class='muted'>Varlik yok.</p>";return;}p.assets.forEach(function(a){var rented=a.ownership==="rent";box.innerHTML+="<div class='item'><b>"+a.name+"</b><span class='right'>"+(rented?"Kiralik":fmt(a.value))+"</span><br><span class='muted'>"+a.type+" | "+(rented?"Kira/gider: "+a.expense:"Gelir: "+(a.income||0)+" | Gider: "+(a.expense||0))+"</span><div class='row'><button class='gray' onclick=\"editAsset('a.id+"')\">Duzenle</button><button class='green' onclick=\"addAssetValue('a.id+"')\">Deger Ekle</button><button class='green' onclick=\"sellAsset('a.id+"')\">"+(rented?"Kirayi Bitir":"Sat")+"</button><button class='red' onclick=\"delAsset('a.id+"')\">Sil</button></div></div>";});}
+function renderAssets(){
+ var p=active(),box=document.getElementById("assetList");box.innerHTML="";
+ if(!p||p.assets.length===0){box.innerHTML="<p class='muted'>Varlik yok.</p>";return;}
+ p.assets.forEach(function(a){
+  var rented=a.ownership==="rent";
+  var right=rented?"Kiralik":fmt(a.value);
+  var detail=a.type+" | "+(rented?"Kira/gider: "+a.expense:"Gelir: "+(a.income||0)+" | Gider: "+(a.expense||0));
+  var saleText=rented?"Kirayi Bitir":"Sat";
+  box.innerHTML+=`<div class='item'><b>${a.name}</b><span class='right'>${right}</span><br><span class='muted'>${detail}</span><div class='row'><button class='gray' onclick="editAsset('${a.id}')">Duzenle</button><button class='green' onclick="addAssetValue('${a.id}')">Deger Ekle</button><button class='green' onclick="sellAsset('${a.id}')">${saleText}</button><button class='red' onclick="delAsset('${a.id}')">Sil</button></div></div>`;
+ });
+}
 function findAsset(id){var p=active();return p.assets.find(function(x){return x.id===id;});}
 function editAsset(id){var p=active(),a=findAsset(id);if(!a)return;var old=n(a.value);var nv=prompt("Yeni deger",a.value);if(nv===null)return;var diff=n(nv)-old;if(diff>0 && a.ownership!=="rent"){if(!charge(p,diff,a.name+" deger artisi."))return;}a.value=n(nv);a.income=prompt("Haftalik gelir",a.income||"")||"";a.expense=prompt("Haftalik gider/kira",a.expense||"")||"";log(a.name+" guncellendi.");render();}
 function addAssetValue(id){var p=active(),a=findAsset(id);if(!a||a.ownership==="rent"){alert("Kiralik varliga deger eklenmez.");return;}var amt=n(prompt("Eklenecek deger",0));if(amt<=0)return;if(!charge(p,amt,a.name+" icin deger eklendi."))return;a.value+=amt;render();}
@@ -136,7 +146,15 @@ function sellAsset(id){var p=active(),a=findAsset(id);if(!a)return;if(a.ownershi
 function delAsset(id){var p=active(),a=findAsset(id);if(!a)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.assets=p.assets.filter(function(x){return x.id!==id;});log(a.name+" silindi.");render();}
 
 function addCompany(){var p=active();if(!p){alert("Once profil olustur.");return;}var val=n(document.getElementById("companyValue").value),share=n(document.getElementById("companyShare").value||100),cost=val*share/100;var c={id:uid(),sector:document.getElementById("companySector").value,name:document.getElementById("companyName").value.trim(),value:val,share:share,income:document.getElementById("companyIncome").value.trim(),expense:document.getElementById("companyExpense").value.trim()};if(!c.name){alert("Sirket adi yaz.");return;}if(!charge(p,cost,c.name+" sirket payi alindi."))return;p.companies.push(c);["companyName","companyValue","companyIncome","companyExpense"].forEach(function(id){document.getElementById(id).value="";});document.getElementById("companyShare").value="100";render();}
-function renderCompanies(){var p=active(),box=document.getElementById("companyList");box.innerHTML="";if(!p||p.companies.length===0){box.innerHTML="<p class='muted'>Sirket yok.</p>";return;}p.companies.forEach(function(c){box.innerHTML+="<div class='item'><b>"+c.name+"</b><span class='right'>"+fmt(c.value*c.share/100)+"</span><br><span class='muted'>"+c.sector+" | Hisse %"+c.share+" | Sirket degeri: "+fmt(c.value)+" | Haftalik kar: "+fmt(parseRange(c.income)-parseRange(c.expense))+"</span><div class='row'><button class='gray' onclick=\"editCompany('c.id+"')\">Duzenle</button><button class='green' onclick=\"addCompanyCapital('c.id+"')\">Sermaye</button><button class='green' onclick=\"sellCompany('c.id+"')\">Sat</button><button class='red' onclick=\"delCompany('c.id+"')\">Sil</button></div></div>";});}
+function renderCompanies(){
+ var p=active(),box=document.getElementById("companyList");box.innerHTML="";
+ if(!p||p.companies.length===0){box.innerHTML="<p class='muted'>Sirket yok.</p>";return;}
+ p.companies.forEach(function(c){
+  var owned=fmt(c.value*c.share/100);
+  var profit=fmt(parseRange(c.income)-parseRange(c.expense));
+  box.innerHTML+=`<div class='item'><b>${c.name}</b><span class='right'>${owned}</span><br><span class='muted'>${c.sector} | Hisse %${c.share} | Sirket degeri: ${fmt(c.value)} | Haftalik kar: ${profit}</span><div class='row'><button class='gray' onclick="editCompany('${c.id}')">Duzenle</button><button class='green' onclick="addCompanyCapital('${c.id}')">Sermaye</button><button class='green' onclick="sellCompany('${c.id}')">Sat</button><button class='red' onclick="delCompany('${c.id}')">Sil</button></div></div>`;
+ });
+}
 function findCompany(id){return active().companies.find(function(x){return x.id===id;});}
 function editCompany(id){var p=active(),c=findCompany(id);if(!c)return;var oldOwned=c.value*c.share/100;var oldValue=c.value;var nv=prompt("Yeni sirket degeri",c.value);if(nv===null)return;var ns=prompt("Yeni hisse %",c.share);if(ns===null)return;c.value=n(nv);c.share=n(ns);var newOwned=c.value*c.share/100;var diff=newOwned-oldOwned;if(diff>0){if(!charge(p,diff,c.name+" pay/deger artisi.")){c.value=oldValue;return;}}var ratio=oldValue>0?c.value/oldValue:1;if(ratio>0&&ratio!==1){c.income=scaleRange(c.income,ratio);c.expense=scaleRange(c.expense,ratio);}c.income=prompt("Haftalik gelir",c.income||"")||"";c.expense=prompt("Haftalik gider",c.expense||"")||"";log(c.name+" guncellendi.");render();}
 function addCompanyCapital(id){var p=active(),c=findCompany(id);if(!c)return;var amt=n(prompt("Eklenecek sermaye",0));if(amt<=0)return;if(!charge(p,amt,c.name+" sermaye artirimi."))return;var old=c.value;c.value+=amt;var ratio=old>0?c.value/old:1;c.income=scaleRange(c.income,ratio);c.expense=scaleRange(c.expense,ratio);render();}
@@ -144,14 +162,28 @@ function sellCompany(id){var p=active(),c=findCompany(id);if(!c)return;gain(p,c.
 function delCompany(id){var p=active(),c=findCompany(id);if(!c)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.companies=p.companies.filter(function(x){return x.id!==id;});log(c.name+" silindi.");render();}
 
 function addInvestment(){var p=active();if(!p){alert("Once profil olustur.");return;}var v=n(document.getElementById("investmentValue").value);var inv={id:uid(),type:document.getElementById("investmentType").value,name:document.getElementById("investmentName").value.trim(),value:v};if(!inv.name){alert("Yatirim adi yaz.");return;}if(!charge(p,v,inv.name+" yatirimi yapildi."))return;p.investments.push(inv);document.getElementById("investmentName").value="";document.getElementById("investmentValue").value="";render();}
-function renderInvestments(){var p=active(),box=document.getElementById("investmentList");box.innerHTML="";if(!p||p.investments.length===0){box.innerHTML="<p class='muted'>Yatirim yok.</p>";return;}p.investments.forEach(function(x){box.innerHTML+="<div class='item'><b>"+x.name+"</b><span class='right'>"+fmt(x.value)+"</span><br><span class='muted'>"+x.type+"</span><div class='row'><button class='gray' onclick=\"editInvestment('x.id+"')\">Duzenle</button><button class='green' onclick=\"addInvestmentMoney('x.id+"')\">Para Ekle</button><button class='green' onclick=\"sellInvestment('x.id+"')\">Sat</button><button class='red' onclick=\"delInvestment('x.id+"')\">Sil</button></div></div>";});}
+function renderInvestments(){
+ var p=active(),box=document.getElementById("investmentList");box.innerHTML="";
+ if(!p||p.investments.length===0){box.innerHTML="<p class='muted'>Yatirim yok.</p>";return;}
+ p.investments.forEach(function(x){
+  box.innerHTML+=`<div class='item'><b>${x.name}</b><span class='right'>${fmt(x.value)}</span><br><span class='muted'>${x.type}</span><div class='row'><button class='gray' onclick="editInvestment('${x.id}')">Duzenle</button><button class='green' onclick="addInvestmentMoney('${x.id}')">Para Ekle</button><button class='green' onclick="sellInvestment('${x.id}')">Sat</button><button class='red' onclick="delInvestment('${x.id}')">Sil</button></div></div>`;
+ });
+}
 function findInvestment(id){return active().investments.find(function(x){return x.id===id;});}
 function editInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;var old=n(x.value);var nv=prompt("Yeni deger",x.value);if(nv===null)return;var diff=n(nv)-old;if(diff>0){if(!charge(p,diff,x.name+" yatirim artisi."))return;}x.value=n(nv);log(x.name+" guncellendi.");render();}
 function addInvestmentMoney(id){var p=active(),x=findInvestment(id);if(!x)return;var amt=n(prompt("Eklenecek para",0));if(amt<=0)return;if(!charge(p,amt,x.name+" yatirimina para eklendi."))return;x.value+=amt;render();}
 function sellInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;gain(p,x.value,x.name+" satildi.");p.investments=p.investments.filter(function(a){return a.id!==id;});render();}
 function delInvestment(id){var p=active(),x=findInvestment(id);if(!x)return;if(!confirm("Silinsin mi? Para islemi yapilmaz."))return;p.investments=p.investments.filter(function(a){return a.id!==id;});log(x.name+" silindi.");render();}
 
-function renderBank(){var p=active();var box=document.getElementById("loanList");if(!p){document.getElementById("bankCashView").textContent=fmt(0);document.getElementById("bankBalanceView").textContent=fmt(0);document.getElementById("debtView").textContent=fmt(0);document.getElementById("paymentView").textContent=fmt(0);box.innerHTML="<p class='muted'>Once profil olustur.</p>";return;}document.getElementById("bankCashView").textContent=fmt(p.cash);document.getElementById("bankBalanceView").textContent=fmt(p.bank);document.getElementById("debtView").textContent=fmt(debt(p));document.getElementById("paymentView").textContent=fmt(weeklyPayments(p));box.innerHTML="";if(!p.loans||p.loans.length===0){box.innerHTML="<p class='muted'>Kredi yok.</p>";return;}p.loans.forEach(function(l){box.innerHTML+="<div class='item'><b>"+l.name+"</b><span class='right'>"+fmt(l.remaining)+"</span><br><span class='muted'>Haftalik taksit: "+fmt(l.payment)+"</span><div class='row2'><button class='green' onclick=\"payLoanExtra('l.id+"')\">Ek Odeme</button><button class='red' onclick=\"deleteLoan('l.id+"')\">Sil</button></div></div>";});}
+function renderBank(){
+ var p=active();var box=document.getElementById("loanList");
+ if(!p){document.getElementById("bankCashView").textContent=fmt(0);document.getElementById("bankBalanceView").textContent=fmt(0);document.getElementById("debtView").textContent=fmt(0);document.getElementById("paymentView").textContent=fmt(0);box.innerHTML="<p class='muted'>Once profil olustur.</p>";return;}
+ document.getElementById("bankCashView").textContent=fmt(p.cash);document.getElementById("bankBalanceView").textContent=fmt(p.bank);document.getElementById("debtView").textContent=fmt(debt(p));document.getElementById("paymentView").textContent=fmt(weeklyPayments(p));box.innerHTML="";
+ if(!p.loans||p.loans.length===0){box.innerHTML="<p class='muted'>Kredi yok.</p>";return;}
+ p.loans.forEach(function(l){
+  box.innerHTML+=`<div class='item'><b>${l.name}</b><span class='right'>${fmt(l.remaining)}</span><br><span class='muted'>Haftalik taksit: ${fmt(l.payment)}</span><div class='row2'><button class='green' onclick="payLoanExtra('${l.id}')">Ek Odeme</button><button class='red' onclick="deleteLoan('${l.id}')">Sil</button></div></div>`;
+ });
+}
 function depositBank(){var p=active();if(!p){alert("Once profil olustur.");return;}var amt=n(document.getElementById("bankAmount").value);if(amt<=0)return;if(!charge(p,amt,"bankaya para yatirildi."))return;p.bank+=amt;document.getElementById("bankAmount").value="";render();}
 function withdrawBank(){var p=active();if(!p){alert("Once profil olustur.");return;}var amt=n(document.getElementById("bankAmount").value);if(amt<=0)return;if(p.bank<amt){alert("Banka bakiyesi yetersiz.");return;}p.bank-=amt;gain(p,amt,"bankadan para cekildi.");document.getElementById("bankAmount").value="";render();}
 function takeLoan(){var p=active();if(!p){alert("Once profil olustur.");return;}var name=document.getElementById("loanName").value.trim()||"Kredi";var amount=n(document.getElementById("loanAmount").value);var payment=n(document.getElementById("loanPayment").value);if(amount<=0){alert("Kredi tutari yaz.");return;}if(payment<=0){alert("Haftalik taksit yaz.");return;}p.loans=p.loans||[];p.loans.push({id:uid(),name:name,amount:amount,remaining:amount,payment:payment});p.cash+=amount;log("+"+fmt(amount)+" "+name+" cekildi.");["loanName","loanAmount","loanPayment"].forEach(function(id){document.getElementById(id).value="";});render();}
@@ -161,7 +193,7 @@ function deleteLoan(id){var p=active(),l=findLoan(id);if(!l)return;if(!confirm("
 
 function addNpc(){var npc={id:uid(),name:document.getElementById("npcName").value.trim(),wealth:n(document.getElementById("npcWealth").value),sector:document.getElementById("npcSector").value.trim(),min:n(document.getElementById("npcMin").value||game.settings.npcMin),max:n(document.getElementById("npcMax").value||game.settings.npcMax)};if(!npc.name){alert("NPC adi yaz.");return;}game.npcs.push(npc);log(npc.name+" NPC eklendi.");["npcName","npcWealth","npcSector","npcMin","npcMax"].forEach(function(id){document.getElementById(id).value="";});render();}
 function randomNpc(){var name=firstNames[Math.floor(Math.random()*firstNames.length)]+" "+lastNames[Math.floor(Math.random()*lastNames.length)];var sec=sectors[Math.floor(Math.random()*sectors.length)];var w=Math.round(50000+Math.random()*5000000);game.npcs.push({id:uid(),name:name,wealth:w,sector:sec,min:game.settings.npcMin,max:game.settings.npcMax});}
-function renderNpcs(){var box=document.getElementById("npcList");box.innerHTML="";if(game.npcs.length===0){box.innerHTML="<p class='muted'>NPC yok.</p>";return;}game.npcs.forEach(function(x){box.innerHTML+="<div class='item'><b>"+x.name+"</b><span class='right'>"+fmt(x.wealth)+"</span><br><span class='muted'>"+(x.sector||"-")+" | %"+x.min+" / %"+x.max+"</span><div class='row2'><button class='gray' onclick=\"editNpc('x.id+"')\">Duzenle</button><button class='red' onclick=\"delNpc('x.id+"')\">Sil</button></div></div>";});}
+function renderNpcs(){var box=document.getElementById("npcList");box.innerHTML="";if(game.npcs.length===0){box.innerHTML="<p class='muted'>NPC yok.</p>";return;}game.npcs.forEach(function(x){box.innerHTML+="<div class='item'><b>"+x.name+"</b><span class='right'>"+fmt(x.wealth)+"</span><br><span class='muted'>"+(x.sector||"-")+" | %"+x.min+" / %"+x.max+"</span><div class='row2'><button class='gray' onclick='editNpc(""+x.id+"")'>Duzenle</button><button class='red' onclick='delNpc(""+x.id+"")'>Sil</button></div></div>";});}
 function editNpc(id){var x=game.npcs.find(function(a){return a.id===id;});if(!x)return;x.wealth=n(prompt("Servet",x.wealth));x.sector=prompt("Sektor",x.sector||"")||"";x.min=n(prompt("Min %",x.min));x.max=n(prompt("Max %",x.max));render();}
 function delNpc(id){game.npcs=game.npcs.filter(function(x){return x.id!==id;});render();}
 
