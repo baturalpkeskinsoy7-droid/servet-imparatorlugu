@@ -6,122 +6,164 @@
   <title>Servet Imparatorlugu</title>
   <style>
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #090d16;
-      color: #f8fafc;
-      font-family: Arial, sans-serif;
-    }
-    .app {
-      max-width: 520px;
-      margin: 0 auto;
-      padding: 16px;
-    }
-    .card {
-      background: #121826;
-      border: 1px solid #2b3448;
-      border-radius: 18px;
-      padding: 16px;
-      margin-bottom: 14px;
-    }
+    body { margin: 0; background: #090d16; color: #f8fafc; font-family: Arial, sans-serif; }
+    .app { max-width: 560px; margin: 0 auto; padding: 16px; padding-bottom: 40px; }
+    .card { background: #121826; border: 1px solid #2b3448; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
     h1 { margin: 0 0 8px; font-size: 28px; }
     h2 { margin: 0 0 12px; font-size: 22px; }
+    h3 { margin: 14px 0 8px; font-size: 18px; }
     p { margin: 8px 0; }
     .muted { color: #9ca3af; }
     .status { color: #22c55e; font-weight: bold; }
     .error { color: #f87171; font-weight: bold; }
-    input, select, button {
-      width: 100%;
-      padding: 14px;
-      margin-top: 10px;
-      border-radius: 14px;
-      border: 1px solid #334155;
-      font-size: 17px;
+    input, select, button, textarea {
+      width: 100%; padding: 14px; margin-top: 10px; border-radius: 14px;
+      border: 1px solid #334155; font-size: 16px;
     }
-    input, select {
-      background: #0b1020;
-      color: #ffffff;
-    }
-    button {
-      background: #2563eb;
-      color: #ffffff;
-      font-weight: bold;
-      cursor: pointer;
-    }
+    input, select, textarea { background: #0b1020; color: #ffffff; }
+    textarea { min-height: 80px; resize: vertical; }
+    button { background: #2563eb; color: #ffffff; font-weight: bold; cursor: pointer; }
     button:active { transform: scale(0.99); }
+    .secondary { background: #1f2937; }
     .danger { background: #991b1b; }
-    .tabs {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-bottom: 14px;
-    }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
     .tabbtn { background: #1f2937; }
     .tabbtn.active { background: #2563eb; }
     .tab { display: none; }
     .tab.active { display: block; }
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    .stat {
-      background: #0b1020;
-      border: 1px solid #26324a;
-      border-radius: 14px;
-      padding: 12px;
-    }
-    .stat b { font-size: 20px; }
-    .item {
-      background: #0b1020;
-      border: 1px solid #26324a;
-      border-radius: 14px;
-      padding: 12px;
-      margin-top: 10px;
-    }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 12px; }
+    .stat b { font-size: 18px; }
+    .item { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 12px; margin-top: 10px; }
+    .item-head { display: flex; justify-content: space-between; gap: 10px; align-items: flex-start; }
+    .item-title { font-weight: bold; font-size: 17px; }
+    .mini { font-size: 13px; color: #9ca3af; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .pill { display: inline-block; padding: 4px 8px; border-radius: 999px; background: #1f2937; color: #cbd5e1; font-size: 12px; margin-top: 6px; }
+    .deleteBtn { width: auto; padding: 8px 10px; margin: 0; border-radius: 10px; background: #7f1d1d; font-size: 13px; }
+    .full { grid-column: 1 / -1; }
+    .rank { display: flex; justify-content: space-between; gap: 10px; align-items: center; }
   </style>
 </head>
 <body>
   <div class="app">
     <div class="card">
       <h1>Servet Imparatorlugu</h1>
-      <p class="muted">Temiz test surumu v0.1</p>
+      <p class="muted">v0.2 - Varlik, sirket, yatirim ve siralama</p>
       <p id="status" class="status">Motor yukleniyor...</p>
     </div>
 
     <div class="card">
       <h2>Profil Secimi</h2>
       <select id="profileSelect"></select>
-      <input id="profileName" type="text" placeholder="Profil adi">
-      <input id="profileCash" type="number" placeholder="Baslangic nakit">
+      <div class="row">
+        <input id="profileName" type="text" placeholder="Profil adi">
+        <input id="profileCash" type="number" placeholder="Nakit">
+      </div>
       <button id="addProfileBtn" type="button">+ Profil Olustur</button>
     </div>
 
     <div class="tabs">
       <button class="tabbtn active" type="button" data-tab="panel">Ana Panel</button>
-      <button class="tabbtn" type="button" data-tab="profiles">Profiller</button>
-      <button id="nextWeekBtn" type="button">Haftayi Ilerlet</button>
-      <button id="resetBtn" class="danger" type="button">Sifirla</button>
+      <button class="tabbtn" type="button" data-tab="assets">Varliklar</button>
+      <button class="tabbtn" type="button" data-tab="companies">Sirketler</button>
+      <button class="tabbtn" type="button" data-tab="investments">Yatirimlar</button>
+      <button class="tabbtn" type="button" data-tab="ranking">Siralama</button>
+      <button class="tabbtn" type="button" data-tab="settings">Ayarlar</button>
     </div>
 
     <div id="panel" class="tab active card">
       <h2>Ana Panel</h2>
       <div class="grid">
         <div class="stat">Aktif Profil<br><b id="activeProfile">Yok</b></div>
-        <div class="stat">Nakit<br><b id="cashView">0</b> EUR</div>
         <div class="stat">Hafta<br><b id="weekView">1</b></div>
-        <div class="stat">Profil Sayisi<br><b id="profileCount">0</b></div>
+        <div class="stat">Nakit<br><b id="cashView">0 EUR</b></div>
+        <div class="stat">Toplam Servet<br><b id="wealthView">0 EUR</b></div>
+        <div class="stat">Varlik<br><b id="assetCount">0</b></div>
+        <div class="stat">Sirket<br><b id="companyCount">0</b></div>
       </div>
+      <button id="nextWeekBtn" type="button">Haftayi Ilerlet</button>
+      <h3>Son Hareketler</h3>
+      <div id="logList" class="muted">Henuz hareket yok.</div>
     </div>
 
-    <div id="profiles" class="tab card">
-      <h2>Profiller</h2>
-      <div id="profileList" class="muted">Profil yok.</div>
+    <div id="assets" class="tab card">
+      <h2>Varlik Ekle</h2>
+      <select id="assetType">
+        <option value="Araba">Araba</option>
+        <option value="Ev">Ev</option>
+        <option value="Arsa">Arsa</option>
+        <option value="Depo">Depo</option>
+        <option value="Fabrika">Fabrika</option>
+        <option value="Diger">Diger</option>
+      </select>
+      <input id="assetName" type="text" placeholder="Orn: BMW M5, arsa, villa">
+      <div class="row">
+        <input id="assetValue" type="number" placeholder="Guncel deger">
+        <input id="assetMonthly" type="number" placeholder="Aylik gelir/gider">
+      </div>
+      <textarea id="assetNote" placeholder="Not"></textarea>
+      <button id="addAssetBtn" type="button">Varlik Olustur</button>
+      <div id="assetList"></div>
+    </div>
+
+    <div id="companies" class="tab card">
+      <h2>Sirket Ekle</h2>
+      <select id="companySector">
+        <option value="Sanayi">Sanayi</option>
+        <option value="Mermer">Mermer</option>
+        <option value="Insaat">Insaat</option>
+        <option value="Turizm">Turizm</option>
+        <option value="Lojistik">Lojistik</option>
+        <option value="Teknoloji">Teknoloji</option>
+        <option value="Diger">Diger</option>
+      </select>
+      <input id="companyName" type="text" placeholder="Orn: Keskinsoy Makine">
+      <div class="row">
+        <input id="companyValue" type="number" placeholder="Sirket degeri">
+        <input id="companyShare" type="number" placeholder="Sahiplik %">
+      </div>
+      <div class="row">
+        <input id="companyIncome" type="number" placeholder="Aylik gelir">
+        <input id="companyExpense" type="number" placeholder="Aylik gider">
+      </div>
+      <button id="addCompanyBtn" type="button">Sirket Olustur</button>
+      <div id="companyList"></div>
+    </div>
+
+    <div id="investments" class="tab card">
+      <h2>Yatirim Ekle</h2>
+      <select id="investmentType">
+        <option value="Kripto">Kripto</option>
+        <option value="Hisse">Hisse</option>
+        <option value="Fon">Fon</option>
+        <option value="Altin">Altin</option>
+        <option value="Doviz">Doviz</option>
+        <option value="Diger">Diger</option>
+      </select>
+      <input id="investmentName" type="text" placeholder="Orn: BTC, SOL, Apple hissesi">
+      <input id="investmentValue" type="number" placeholder="Guncel deger">
+      <button id="addInvestmentBtn" type="button">Yatirim Olustur</button>
+      <div id="investmentList"></div>
+    </div>
+
+    <div id="ranking" class="tab card">
+      <h2>Servet Siralamasi</h2>
+      <div id="rankingList"></div>
+    </div>
+
+    <div id="settings" class="tab card">
+      <h2>Ayarlar</h2>
+      <button id="exportBtn" class="secondary" type="button">Veriyi Disa Aktar</button>
+      <textarea id="importBox" placeholder="Yedek veriyi buraya yapistir"></textarea>
+      <button id="importBtn" class="secondary" type="button">Ice Aktar</button>
+      <button id="resetBtn" class="danger" type="button">Tum Verileri Sifirla</button>
+      <p class="muted">Veriler Safari/GitHub Pages tarayici hafizasinda saklanir.</p>
     </div>
   </div>
 
   <script>
-    window.onerror = function(message, source, line, column, error) {
+    window.onerror = function(message, source, line) {
       var status = document.getElementById("status");
       if (status) {
         status.className = "error";
@@ -129,168 +171,257 @@
       }
     };
 
+    var STORE_KEY = "servet_game_v02";
     var game = {
       week: 1,
       activeProfileId: null,
-      profiles: []
+      profiles: [],
+      logs: []
     };
 
-    function saveGame() {
-      localStorage.setItem("servet_clean_v01", JSON.stringify(game));
-    }
-
+    function saveGame() { localStorage.setItem(STORE_KEY, JSON.stringify(game)); }
     function loadGame() {
-      var data = localStorage.getItem("servet_clean_v01");
-      if (data) {
-        game = JSON.parse(data);
-      }
+      var data = localStorage.getItem(STORE_KEY);
+      if (data) { game = JSON.parse(data); }
+      for (var i = 0; i < game.profiles.length; i++) { normalizeProfile(game.profiles[i]); }
     }
-
+    function normalizeProfile(p) {
+      if (!p.assets) p.assets = [];
+      if (!p.companies) p.companies = [];
+      if (!p.investments) p.investments = [];
+      if (typeof p.cash !== "number") p.cash = Number(p.cash || 0);
+    }
+    function money(n) { return Number(n || 0).toLocaleString("tr-TR") + " EUR"; }
+    function log(text) {
+      game.logs.unshift("Hafta " + game.week + ": " + text);
+      if (game.logs.length > 8) game.logs.pop();
+    }
     function getActiveProfile() {
       for (var i = 0; i < game.profiles.length; i++) {
-        if (game.profiles[i].id === game.activeProfileId) {
-          return game.profiles[i];
-        }
+        if (game.profiles[i].id === game.activeProfileId) return game.profiles[i];
       }
       return null;
     }
+    function calcProfileWealth(p) {
+      normalizeProfile(p);
+      var total = Number(p.cash || 0);
+      for (var i = 0; i < p.assets.length; i++) total += Number(p.assets[i].value || 0);
+      for (var j = 0; j < p.investments.length; j++) total += Number(p.investments[j].value || 0);
+      for (var k = 0; k < p.companies.length; k++) {
+        total += Number(p.companies[k].value || 0) * (Number(p.companies[k].share || 100) / 100);
+      }
+      return Math.round(total);
+    }
+    function requireProfile() {
+      var p = getActiveProfile();
+      if (!p) alert("Once profil olustur.");
+      return p;
+    }
+    function clearInputs(ids) {
+      for (var i = 0; i < ids.length; i++) document.getElementById(ids[i]).value = "";
+    }
 
     function addProfile() {
-      var nameInput = document.getElementById("profileName");
-      var cashInput = document.getElementById("profileCash");
-      var name = nameInput.value.trim();
-      var cash = Number(cashInput.value || 0);
-
-      if (!name) {
-        alert("Profil adi yaz.");
-        return;
-      }
-
-      var profile = {
+      var name = document.getElementById("profileName").value.trim();
+      var cash = Number(document.getElementById("profileCash").value || 0);
+      if (!name) { alert("Profil adi yaz."); return; }
+      var p = { id: String(Date.now()), name: name, cash: cash, assets: [], companies: [], investments: [] };
+      game.profiles.push(p);
+      game.activeProfileId = p.id;
+      clearInputs(["profileName", "profileCash"]);
+      log(name + " profili olusturuldu.");
+      saveGame(); render(); alert("Profil olusturuldu.");
+    }
+    function selectProfile() { game.activeProfileId = document.getElementById("profileSelect").value; saveGame(); render(); }
+    function addAsset() {
+      var p = requireProfile(); if (!p) return;
+      var name = document.getElementById("assetName").value.trim();
+      if (!name) { alert("Varlik adi yaz."); return; }
+      var item = {
         id: String(Date.now()),
+        type: document.getElementById("assetType").value,
         name: name,
-        cash: cash
+        value: Number(document.getElementById("assetValue").value || 0),
+        monthly: Number(document.getElementById("assetMonthly").value || 0),
+        note: document.getElementById("assetNote").value.trim()
       };
-
-      game.profiles.push(profile);
-      game.activeProfileId = profile.id;
-
-      nameInput.value = "";
-      cashInput.value = "";
-
-      saveGame();
-      render();
-      alert("Profil olusturuldu.");
+      p.assets.push(item);
+      clearInputs(["assetName", "assetValue", "assetMonthly", "assetNote"]);
+      log(item.name + " varligi eklendi.");
+      saveGame(); render();
     }
-
-    function selectProfile() {
-      var select = document.getElementById("profileSelect");
-      game.activeProfileId = select.value;
-      saveGame();
-      render();
+    function addCompany() {
+      var p = requireProfile(); if (!p) return;
+      var name = document.getElementById("companyName").value.trim();
+      if (!name) { alert("Sirket adi yaz."); return; }
+      var share = Number(document.getElementById("companyShare").value || 100);
+      if (share < 0) share = 0; if (share > 100) share = 100;
+      var item = {
+        id: String(Date.now()),
+        sector: document.getElementById("companySector").value,
+        name: name,
+        value: Number(document.getElementById("companyValue").value || 0),
+        share: share,
+        income: Number(document.getElementById("companyIncome").value || 0),
+        expense: Number(document.getElementById("companyExpense").value || 0)
+      };
+      p.companies.push(item);
+      clearInputs(["companyName", "companyValue", "companyShare", "companyIncome", "companyExpense"]);
+      log(item.name + " sirketi kuruldu.");
+      saveGame(); render();
     }
-
+    function addInvestment() {
+      var p = requireProfile(); if (!p) return;
+      var name = document.getElementById("investmentName").value.trim();
+      if (!name) { alert("Yatirim adi yaz."); return; }
+      var item = {
+        id: String(Date.now()),
+        type: document.getElementById("investmentType").value,
+        name: name,
+        value: Number(document.getElementById("investmentValue").value || 0)
+      };
+      p.investments.push(item);
+      clearInputs(["investmentName", "investmentValue"]);
+      log(item.name + " yatirimi eklendi.");
+      saveGame(); render();
+    }
+    function deleteItem(kind, id) {
+      var p = requireProfile(); if (!p) return;
+      p[kind] = p[kind].filter(function(x) { return x.id !== id; });
+      log("Bir kayit silindi.");
+      saveGame(); render();
+    }
     function nextWeek() {
-      game.week = game.week + 1;
-      saveGame();
-      render();
-      alert("Hafta ilerledi.");
+      game.week += 1;
+      for (var i = 0; i < game.profiles.length; i++) {
+        var p = game.profiles[i]; normalizeProfile(p);
+        for (var a = 0; a < p.assets.length; a++) {
+          p.assets[a].value = Math.round(Number(p.assets[a].value || 0) * (1 + ((Math.random() * 3 - 1) / 100)));
+          p.cash += Math.round(Number(p.assets[a].monthly || 0) / 4);
+        }
+        for (var c = 0; c < p.companies.length; c++) {
+          var comp = p.companies[c];
+          comp.value = Math.round(Number(comp.value || 0) * (1 + ((Math.random() * 8 - 3) / 100)));
+          p.cash += Math.round((Number(comp.income || 0) - Number(comp.expense || 0)) / 4 * (Number(comp.share || 100) / 100));
+        }
+        for (var inv = 0; inv < p.investments.length; inv++) {
+          p.investments[inv].value = Math.round(Number(p.investments[inv].value || 0) * (1 + ((Math.random() * 14 - 6) / 100)));
+        }
+        p.cash = Math.round(p.cash);
+      }
+      log("Haftalik ekonomi guncellendi.");
+      saveGame(); render(); alert("Hafta ilerledi.");
     }
-
     function openTab(tabId) {
       var tabs = document.getElementsByClassName("tab");
       var buttons = document.getElementsByClassName("tabbtn");
-      var i;
-
-      for (i = 0; i < tabs.length; i++) {
-        tabs[i].classList.remove("active");
-      }
-      for (i = 0; i < buttons.length; i++) {
-        buttons[i].classList.remove("active");
-      }
-
+      for (var i = 0; i < tabs.length; i++) tabs[i].classList.remove("active");
+      for (var j = 0; j < buttons.length; j++) buttons[j].classList.remove("active");
       document.getElementById(tabId).classList.add("active");
-
-      for (i = 0; i < buttons.length; i++) {
-        if (buttons[i].getAttribute("data-tab") === tabId) {
-          buttons[i].classList.add("active");
-        }
+      for (var k = 0; k < buttons.length; k++) {
+        if (buttons[k].getAttribute("data-tab") === tabId) buttons[k].classList.add("active");
       }
     }
-
+    function exportData() {
+      document.getElementById("importBox").value = JSON.stringify(game);
+      alert("Yedek metni kutuya yazildi. Kopyalayabilirsin.");
+    }
+    function importData() {
+      var text = document.getElementById("importBox").value.trim();
+      if (!text) { alert("Yedek metni yapistir."); return; }
+      try { game = JSON.parse(text); saveGame(); render(); alert("Veri ice aktarildi."); }
+      catch (e) { alert("Yedek okunamadi."); }
+    }
     function resetGame() {
-      var ok = confirm("Tum veriler silinsin mi?");
-      if (!ok) {
-        return;
-      }
-
-      localStorage.removeItem("servet_clean_v01");
-      game = {
-        week: 1,
-        activeProfileId: null,
-        profiles: []
-      };
+      if (!confirm("Tum veriler silinsin mi?")) return;
+      localStorage.removeItem(STORE_KEY);
+      game = { week: 1, activeProfileId: null, profiles: [], logs: [] };
       render();
     }
 
     function render() {
       var select = document.getElementById("profileSelect");
       select.innerHTML = "";
-
       if (game.profiles.length === 0) {
         var emptyOption = document.createElement("option");
-        emptyOption.value = "";
-        emptyOption.textContent = "Profil yok";
-        select.appendChild(emptyOption);
+        emptyOption.value = ""; emptyOption.textContent = "Profil yok"; select.appendChild(emptyOption);
       } else {
         for (var i = 0; i < game.profiles.length; i++) {
-          var p = game.profiles[i];
+          var p0 = game.profiles[i];
           var option = document.createElement("option");
-          option.value = p.id;
-          option.textContent = p.name;
-          if (p.id === game.activeProfileId) {
-            option.selected = true;
-          }
+          option.value = p0.id; option.textContent = p0.name;
+          if (p0.id === game.activeProfileId) option.selected = true;
           select.appendChild(option);
         }
       }
-
-      var active = getActiveProfile();
-      document.getElementById("activeProfile").textContent = active ? active.name : "Yok";
-      document.getElementById("cashView").textContent = active ? String(active.cash) : "0";
+      var p = getActiveProfile();
+      document.getElementById("activeProfile").textContent = p ? p.name : "Yok";
       document.getElementById("weekView").textContent = String(game.week);
-      document.getElementById("profileCount").textContent = String(game.profiles.length);
-
-      var list = document.getElementById("profileList");
-      if (game.profiles.length === 0) {
-        list.textContent = "Profil yok.";
-      } else {
-        var html = "";
-        for (var j = 0; j < game.profiles.length; j++) {
-          html += "<div class='item'><b>" + game.profiles[j].name + "</b><br>" + game.profiles[j].cash + " EUR</div>";
-        }
-        list.innerHTML = html;
+      document.getElementById("cashView").textContent = p ? money(p.cash) : money(0);
+      document.getElementById("wealthView").textContent = p ? money(calcProfileWealth(p)) : money(0);
+      document.getElementById("assetCount").textContent = p ? String(p.assets.length) : "0";
+      document.getElementById("companyCount").textContent = p ? String(p.companies.length) : "0";
+      renderAssets(p); renderCompanies(p); renderInvestments(p); renderRanking(); renderLogs();
+    }
+    function renderAssets(p) {
+      var box = document.getElementById("assetList"); box.innerHTML = "";
+      if (!p || p.assets.length === 0) { box.innerHTML = "<p class='muted'>Henuz varlik yok.</p>"; return; }
+      for (var i = 0; i < p.assets.length; i++) {
+        var a = p.assets[i];
+        box.innerHTML += "<div class='item'><div class='item-head'><div><div class='item-title'>" + a.name + "</div><span class='pill'>" + a.type + "</span></div><button class='deleteBtn' onclick=\"deleteItem('assets','" + a.id + "')\">Sil</button></div><p>Deger: <b>" + money(a.value) + "</b></p><p class='mini'>Aylik: " + money(a.monthly) + "</p><p class='mini'>" + (a.note || "") + "</p></div>";
       }
     }
-
+    function renderCompanies(p) {
+      var box = document.getElementById("companyList"); box.innerHTML = "";
+      if (!p || p.companies.length === 0) { box.innerHTML = "<p class='muted'>Henuz sirket yok.</p>"; return; }
+      for (var i = 0; i < p.companies.length; i++) {
+        var c = p.companies[i];
+        var profit = Number(c.income || 0) - Number(c.expense || 0);
+        var shareValue = Number(c.value || 0) * (Number(c.share || 100) / 100);
+        box.innerHTML += "<div class='item'><div class='item-head'><div><div class='item-title'>" + c.name + "</div><span class='pill'>" + c.sector + "</span></div><button class='deleteBtn' onclick=\"deleteItem('companies','" + c.id + "')\">Sil</button></div><p>Sirket degeri: <b>" + money(c.value) + "</b></p><p>Senin payin: <b>" + money(shareValue) + "</b> (%" + c.share + ")</p><p class='mini'>Aylik kar: " + money(profit) + "</p></div>";
+      }
+    }
+    function renderInvestments(p) {
+      var box = document.getElementById("investmentList"); box.innerHTML = "";
+      if (!p || p.investments.length === 0) { box.innerHTML = "<p class='muted'>Henuz yatirim yok.</p>"; return; }
+      for (var i = 0; i < p.investments.length; i++) {
+        var inv = p.investments[i];
+        box.innerHTML += "<div class='item'><div class='item-head'><div><div class='item-title'>" + inv.name + "</div><span class='pill'>" + inv.type + "</span></div><button class='deleteBtn' onclick=\"deleteItem('investments','" + inv.id + "')\">Sil</button></div><p>Deger: <b>" + money(inv.value) + "</b></p></div>";
+      }
+    }
+    function renderRanking() {
+      var box = document.getElementById("rankingList"); box.innerHTML = "";
+      if (game.profiles.length === 0) { box.innerHTML = "<p class='muted'>Siralama icin profil yok.</p>"; return; }
+      var list = game.profiles.slice().sort(function(a,b) { return calcProfileWealth(b) - calcProfileWealth(a); });
+      for (var i = 0; i < list.length; i++) {
+        box.innerHTML += "<div class='item rank'><div><b>" + (i + 1) + ". " + list[i].name + "</b><br><span class='mini'>Profil</span></div><b>" + money(calcProfileWealth(list[i])) + "</b></div>";
+      }
+    }
+    function renderLogs() {
+      var box = document.getElementById("logList");
+      if (!game.logs || game.logs.length === 0) { box.textContent = "Henuz hareket yok."; return; }
+      var html = "";
+      for (var i = 0; i < game.logs.length; i++) html += "<div class='item mini'>" + game.logs[i] + "</div>";
+      box.innerHTML = html;
+    }
     function startApp() {
       loadGame();
       document.getElementById("addProfileBtn").addEventListener("click", addProfile);
       document.getElementById("profileSelect").addEventListener("change", selectProfile);
+      document.getElementById("addAssetBtn").addEventListener("click", addAsset);
+      document.getElementById("addCompanyBtn").addEventListener("click", addCompany);
+      document.getElementById("addInvestmentBtn").addEventListener("click", addInvestment);
       document.getElementById("nextWeekBtn").addEventListener("click", nextWeek);
+      document.getElementById("exportBtn").addEventListener("click", exportData);
+      document.getElementById("importBtn").addEventListener("click", importData);
       document.getElementById("resetBtn").addEventListener("click", resetGame);
-
       var buttons = document.getElementsByClassName("tabbtn");
       for (var i = 0; i < buttons.length; i++) {
-        buttons[i].addEventListener("click", function() {
-          openTab(this.getAttribute("data-tab"));
-        });
+        buttons[i].addEventListener("click", function() { openTab(this.getAttribute("data-tab")); });
       }
-
       document.getElementById("status").textContent = "Motor aktif";
       render();
     }
-
     document.addEventListener("DOMContentLoaded", startApp);
   </script>
 </body>
