@@ -1,0 +1,156 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Servet Imparatorlugu</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; background: #090d16; color: #f8fafc; font-family: Arial, sans-serif; }
+    .app { max-width: 520px; margin: 0 auto; padding: 16px; }
+    .card { background: #121826; border: 1px solid #2b3448; border-radius: 18px; padding: 16px; margin-bottom: 14px; }
+    h1 { margin: 0 0 8px; font-size: 28px; }
+    h2 { margin: 0 0 12px; font-size: 22px; }
+    p { margin: 8px 0; }
+    .muted { color: #9ca3af; }
+    .status { color: #22c55e; font-weight: bold; }
+    .error { color: #f87171; font-weight: bold; }
+    input, select, button { width: 100%; padding: 14px; margin-top: 10px; border-radius: 14px; border: 1px solid #334155; font-size: 17px; }
+    input, select { background: #0b1020; color: #ffffff; }
+    button { background: #2563eb; color: #ffffff; font-weight: bold; cursor: pointer; }
+    button:active { transform: scale(0.99); }
+    .danger { background: #991b1b; }
+    .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+    .tabbtn { background: #1f2937; }
+    .tabbtn.active { background: #2563eb; }
+    .tab { display: none; }
+    .tab.active { display: block; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 12px; }
+    .stat b { font-size: 20px; }
+    .item { background: #0b1020; border: 1px solid #26324a; border-radius: 14px; padding: 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="card">
+      <h1>Servet Imparatorlugu</h1>
+      <p class="muted">Temiz test surumu v0.1</p>
+      <p id="status" class="status">Motor yukleniyor...</p>
+    </div>
+    <div class="card">
+      <h2>Profil Secimi</h2>
+      <select id="profileSelect"></select>
+      <input id="profileName" type="text" placeholder="Profil adi">
+      <input id="profileCash" type="number" placeholder="Baslangic nakit">
+      <button id="addProfileBtn" type="button">+ Profil Olustur</button>
+    </div>
+    <div class="tabs">
+      <button class="tabbtn active" type="button" data-tab="panel">Ana Panel</button>
+      <button class="tabbtn" type="button" data-tab="profiles">Profiller</button>
+      <button id="nextWeekBtn" type="button">Haftayi Ilerlet</button>
+      <button id="resetBtn" class="danger" type="button">Sifirla</button>
+    </div>
+    <div id="panel" class="tab active card">
+      <h2>Ana Panel</h2>
+      <div class="grid">
+        <div class="stat">Aktif Profil<br><b id="activeProfile">Yok</b></div>
+        <div class="stat">Nakit<br><b id="cashView">0</b> EUR</div>
+        <div class="stat">Hafta<br><b id="weekView">1</b></div>
+        <div class="stat">Profil Sayisi<br><b id="profileCount">0</b></div>
+      </div>
+    </div>
+    <div id="profiles" class="tab card">
+      <h2>Profiller</h2>
+      <div id="profileList" class="muted">Profil yok.</div>
+    </div>
+  </div>
+  <script>
+    window.onerror = function(message, source, line, column, error) {
+      var status = document.getElementById("status");
+      if (status) {
+        status.className = "error";
+        status.textContent = "JS HATASI: " + message + " / line " + line;
+      }
+    };
+    var game = { week: 1, activeProfileId: null, profiles: [] };
+    function saveGame() { localStorage.setItem("servet_clean_v01", JSON.stringify(game)); }
+    function loadGame() { var data = localStorage.getItem("servet_clean_v01"); if (data) { game = JSON.parse(data); } }
+    function getActiveProfile() { for (var i = 0; i < game.profiles.length; i++) { if (game.profiles[i].id === game.activeProfileId) { return game.profiles[i]; } } return null; }
+    function addProfile() {
+      var nameInput = document.getElementById("profileName");
+      var cashInput = document.getElementById("profileCash");
+      var name = nameInput.value.trim();
+      var cash = Number(cashInput.value || 0);
+      if (!name) { alert("Profil adi yaz."); return; }
+      var profile = { id: String(Date.now()), name: name, cash: cash };
+      game.profiles.push(profile);
+      game.activeProfileId = profile.id;
+      nameInput.value = "";
+      cashInput.value = "";
+      saveGame(); render(); alert("Profil olusturuldu.");
+    }
+    function selectProfile() { var select = document.getElementById("profileSelect"); game.activeProfileId = select.value; saveGame(); render(); }
+    function nextWeek() { game.week = game.week + 1; saveGame(); render(); alert("Hafta ilerledi."); }
+    function openTab(tabId) {
+      var tabs = document.getElementsByClassName("tab");
+      var buttons = document.getElementsByClassName("tabbtn");
+      var i;
+      for (i = 0; i < tabs.length; i++) { tabs[i].classList.remove("active"); }
+      for (i = 0; i < buttons.length; i++) { buttons[i].classList.remove("active"); }
+      document.getElementById(tabId).classList.add("active");
+      for (i = 0; i < buttons.length; i++) { if (buttons[i].getAttribute("data-tab") === tabId) { buttons[i].classList.add("active"); } }
+    }
+    function resetGame() {
+      var ok = confirm("Tum veriler silinsin mi?");
+      if (!ok) { return; }
+      localStorage.removeItem("servet_clean_v01");
+      game = { week: 1, activeProfileId: null, profiles: [] };
+      render();
+    }
+    function render() {
+      var select = document.getElementById("profileSelect");
+      select.innerHTML = "";
+      if (game.profiles.length === 0) {
+        var emptyOption = document.createElement("option");
+        emptyOption.value = "";
+        emptyOption.textContent = "Profil yok";
+        select.appendChild(emptyOption);
+      } else {
+        for (var i = 0; i < game.profiles.length; i++) {
+          var p = game.profiles[i];
+          var option = document.createElement("option");
+          option.value = p.id;
+          option.textContent = p.name;
+          if (p.id === game.activeProfileId) { option.selected = true; }
+          select.appendChild(option);
+        }
+      }
+      var active = getActiveProfile();
+      document.getElementById("activeProfile").textContent = active ? active.name : "Yok";
+      document.getElementById("cashView").textContent = active ? String(active.cash) : "0";
+      document.getElementById("weekView").textContent = String(game.week);
+      document.getElementById("profileCount").textContent = String(game.profiles.length);
+      var list = document.getElementById("profileList");
+      if (game.profiles.length === 0) { list.textContent = "Profil yok."; }
+      else {
+        var html = "";
+        for (var j = 0; j < game.profiles.length; j++) { html += "<div class='item'><b>" + game.profiles[j].name + "</b><br>" + game.profiles[j].cash + " EUR</div>"; }
+        list.innerHTML = html;
+      }
+    }
+    function startApp() {
+      loadGame();
+      document.getElementById("addProfileBtn").addEventListener("click", addProfile);
+      document.getElementById("profileSelect").addEventListener("change", selectProfile);
+      document.getElementById("nextWeekBtn").addEventListener("click", nextWeek);
+      document.getElementById("resetBtn").addEventListener("click", resetGame);
+      var buttons = document.getElementsByClassName("tabbtn");
+      for (var i = 0; i < buttons.length; i++) { buttons[i].addEventListener("click", function() { openTab(this.getAttribute("data-tab")); }); }
+      document.getElementById("status").textContent = "Motor aktif";
+      render();
+    }
+    document.addEventListener("DOMContentLoaded", startApp);
+  </script>
+</body>
+</html>
